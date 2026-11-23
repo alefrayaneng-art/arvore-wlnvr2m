@@ -474,7 +474,7 @@ function abrir(id){
   var lk='<button type="button" onclick="verNaArvore(\''+id+'\')">🌳 Ver na árvore</button>';
   if(RODA_IDS[id]) lk+='<button type="button" onclick="verNaRoda(\''+id+'\')">⭕ Ver na roda</button>';
   if(LP[id]) lk+='<button type="button" onclick="verNoMapa(\''+id+'\')">🗺️ Ver no mapa</button>';
-  (FS[id]||[]).forEach(function(f){ lk+='<a class="btn" style="text-decoration:none;display:inline-block" target="_blank" rel="noopener" href="https://ancestors.familysearch.org/pt/'+f[0]+'">🌐 '+f[1]+'</a>'; });
+  (FS[id]||[]).forEach(function(f){ lk+='<a class="btn" style="text-decoration:none;display:inline-block" target="_blank" rel="noopener" onclick="return avisoExterno()" href="https://ancestors.familysearch.org/pt/'+f[0]+'">🌐 '+f[1]+'</a>'; });
   if(FS[id]) lk+='<p class="small" style="width:100%;margin:.2rem 0 0">O FamilySearch é um site gratuito de árvores. '+(FSNOTA[id]||'A página abre em outra aba.')+'</p>';
   document.getElementById("pLinks").innerHTML=lk;
   document.getElementById("rNome").value=S.nome||"";
@@ -728,6 +728,9 @@ function verRamo(r){
 
 var fs=20;
 function zoom(d){ fs=Math.max(16,Math.min(30,fs+d)); document.documentElement.style.setProperty("--fs",fs+"px"); }
+function avisoExterno(){
+  return confirm("Atenção: você vai sair da árvore da família e abrir o FamilySearch, um site público e gratuito de genealogia (não é nosso).\n\n• A página abre em outra aba. Para voltar, é só fechar a aba.\n• O que está lá foi escrito por várias pessoas e pode ter erros.\n• O site pode pedir para criar conta. Não precisa: dá para só olhar.\n• Não digite senha nem documento lá.\n\nQuer abrir?");
+}
 /* ===== PÁGINAS PÚBLICAS NO FAMILYSEARCH (só de pessoas falecidas) ===== */
 var FS = {
  julieta:[["GHRM-LKY","Ver a Julieta no FamilySearch"]],
@@ -825,6 +828,25 @@ var FSNOTA = {
   HIST[2].x="O que a família contou, por escrito, é que os Souza da Paraíba tiveram brigas de terra CONTRA o bando de Lampião, e não que eram parentes dele. Nenhum sobrenome dos nossos bisavós aparece na família do Lampião.";
   HIST.push({t:"👵 “Toda” e “Tintina”",x:"A família lembra de bisavós chamados “Toda” e “Tintina Valentina”. O caderno da vó Irani dá uma pista: “Totoda” seria o pai de criação do bisavô Manoel, e “Tintina”, o apelido da mãe dele (Constantina? Valentina?). O registro de óbito do Manoel diz que os pais eram Aristides Domingos da Rosa e Valentina Inês da Conceição.",q:"Quem eram o Totoda e a Tintina? Eram apelidos?"});
   HIST.push({t:"👬 Cosme e Damião",x:"A família lembra de um “Cosme e Damião” do lado da mãe, mas não sabe se eram irmãos ou tios. Os gêmeos Cosme e Damião que a pesquisa achou em Ibiara (1953) não são da nossa família direta.",q:"De quem eram filhos o Cosme e o Damião?"});
+  // achados de 23/11, 00h55 (óbitos de Virgulina e de Eduardo no FamilySearch)
+  P.virgulina.d="26/08/1872 (Conceição/PB) a 30/12/1958 (Piancó/PB)";
+  P.virgulina.sabe=["Mãe da Julieta (óbito dela, 1977).","Registro de óbito de 1958 lido no livro original de Piancó/PB: viúva, 88 anos, filha de Eduardo Pinto Ramalho e Casimira Maria da Conceição."];
+  P.virgulina.falta=["A árvore pública diz que ela casou em 1907, mas os filhos nascem de 1896 em diante. Pode ser um casamento feito depois."];
+  P.eduardo.s="c";
+  P.eduardo.d="Pais da Virgulina. Eduardo morreu em 25/10/1892, em Conceição/PB, com 59 anos";
+  P.eduardo.sabe=["O óbito da Virgulina (1958), lido no original, diz que ela era filha de Eduardo Pinto Ramalho e Casimira Maria da Conceição.","O óbito do próprio Eduardo (1892, Conceição/PB) diz que ele era filho de Manoel Alexandre Pinto Ramalho e Victoria Pinto de São Roberto."];
+  P.eduardo.falta=["Ver a imagem do óbito do Eduardo (por enquanto só lemos o resumo do site).","Confirmar os irmãos da Virgulina que aparecem na árvore pública."];
+  P.manoelalexandre=T("Manoel Alexandre Pinto Ramalho e Victoria Pinto de São Roberto","Pais do Eduardo (avós da Virgulina)","p",["Aparecem como pais do Eduardo no registro de óbito dele (1892, Conceição/PB), pelo resumo do site.","Daqui para trás, a árvore da internet sobe até o Capitão José Pinto Ramalho (1713 a 1782), mas o elo Manoel Alexandre → Aleixo Pinto Ramalho ainda não tem prova."],["Ver a imagem do óbito de 1892.","Achar documento dos pais do Manoel Alexandre."],"Alguém já ouviu o nome “Victoria Pinto”?");
+  CURTO.manoelalexandre="Manoel Alexandre e Victoria";
+  FS.manoelalexandre=[["LKDW-MC1","Ver o Manoel Alexandre"]];
+  FSNOTA.manoelalexandre="Página montada por parentes Ramalho. Os elos mais antigos ainda não têm prova.";
+  G.ramalho.splice(0,1,["Pentavós (avós da Virgulina)",[["manoelalexandre"]]],["Tetravós (pais da Virgulina)",[["eduardo"]]]);
+  FSNOTA.eduardo="Páginas montadas por parentes Ramalho. A do Eduardo tem 26 documentos anexados, entre eles o óbito dele (1892).";
+  LUG.push(["Piancó (PB)",-7.20,-37.93,"ramalho","c","A trisavó Virgulina morreu aqui em 30/12/1958, viúva, com 88 anos.","Registro de óbito (livro de Piancó 1956–1959)"]);
+  LUG[11][5]="A trisavó Virgulina nasceu aqui em 1872, e o pai dela, Eduardo Pinto Ramalho, morreu aqui em 1892. Diz-se que Manoel José e Virgulina se casaram aqui (1907). É também a cidade natal da Elba Ramalho.";
+  LUG[11][6]="Registros civis de óbito (resumo do FamilySearch); casamento de 1907 a confirmar";
+  LP.virgulina=[11,23]; LP.eduardo=[11]; LP.manoelalexandre=[11];
+  HIST[0].x="Elba nasceu em Conceição (PB), onde nasceu a trisavó Virgulina Ramalho (1872). Já temos documento ligando a bisavó Julieta à Virgulina, a Virgulina ao pai Eduardo Pinto Ramalho e o Eduardo ao pai Manoel Alexandre Pinto Ramalho. Uma árvore da internet liga o Manoel Alexandre ao clã Pinto Ramalho e, por ele, ao ramo do Zé Ramalho; se estiver certa, a Julieta e o Zé Ramalho seriam primos distantes. Esse último elo ainda não tem prova.";
   // tarefas novas
   TAREFAS.push(["Foto reta e com boa luz de cada página do caderno da vó Irani","Algumas partes estão borradas, como o começo da página dos 18 filhos."]);
   TAREFAS.push(["Saber se a Laura era irmã do vô Hilário, e o nome completo da Nena","Ajuda a entender a história do primo do Lula."]);

@@ -50,6 +50,8 @@ button:focus-visible,[tabindex]:focus-visible,input:focus-visible,textarea:focus
 .p .st{font-size:.78rem;font-weight:bold;display:block}
 .p.ok .st{color:var(--ok)} .p.ask .st{color:var(--ask)}
 .p .tap{font-size:.78rem;color:#444;display:block;margin-top:.2rem}
+.p .fsl{display:block;font-size:.82rem;font-weight:bold;color:#0b4f8a;text-decoration:underline;margin:.15rem 0;padding:.25rem 0;cursor:pointer}
+.p .fsl:hover,.p .fsl:focus{color:#06325a;background:#eaf2fb}
 .p .aj{display:block;font-size:.8rem;font-weight:bold;background:#fff7cc;border:2px solid #d4a800;border-radius:.4rem;padding:.15rem .35rem;margin-top:.3rem;color:#5a4500}
 .ajudou{background:#fff7cc;border:3px solid #d4a800;border-radius:.7rem;padding:.6rem .9rem;margin:.6rem 0}
 .ajudou ul{margin:.3rem 0 0 1.1rem;padding:0}
@@ -425,7 +427,9 @@ function salvar(){ try{localStorage.setItem("arvoreValentina_v1",JSON.stringify(
 function card(id){
   var p=P[id], ok=p.s==="c";
   return '<button class="p '+(ok?'ok':'ask')+'" data-id="'+id+'" onclick="abrir(\''+id+'\')">'
-   +'<span class="nm">'+p.n+'</span><span class="dt">'+p.d+'</span>'
+   +'<span class="nm">'+p.n+'</span>'
+   +(FS[id]?FS[id].map(function(f){return '<span class="fsl" role="link" tabindex="0" onclick="event.stopPropagation();abrirFS(\''+f[0]+'\')" onkeydown="if(event.key===\'Enter\'){event.stopPropagation();abrirFS(\''+f[0]+'\')}">🌐 '+(FS[id].length>1?f[1].replace(/^Ver o /,"Página do ").replace(/^Ver a /,"Página da "):"Página pública")+' no FamilySearch</span>';}).join(""):'')
+   +'<span class="dt">'+p.d+'</span>'
    +'<span class="st">'+(ok?'✔ Confirmado com documento':'? Ainda não confirmado')+'</span>'
    +(p.aj?'<span class="aj">🏅 '+p.aj+'</span>':'')
    +'<span class="tap">👆 Toque aqui</span></button>';
@@ -728,6 +732,7 @@ function verRamo(r){
 
 var fs=20;
 function zoom(d){ fs=Math.max(16,Math.min(30,fs+d)); document.documentElement.style.setProperty("--fs",fs+"px"); }
+function abrirFS(fid){ if(avisoExterno()) window.open("https://ancestors.familysearch.org/pt/"+fid,"_blank","noopener"); }
 function avisoExterno(){
   return confirm("Atenção: você vai sair da árvore da família e abrir o FamilySearch, um site público e gratuito de genealogia (não é nosso).\n\n• A página abre em outra aba. Para voltar, é só fechar a aba.\n• O que está lá foi escrito por várias pessoas e pode ter erros.\n• O site pode pedir para criar conta. Não precisa: dá para só olhar.\n• Não digite senha nem documento lá.\n\nQuer abrir?");
 }

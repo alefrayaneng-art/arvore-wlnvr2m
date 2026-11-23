@@ -116,6 +116,15 @@ body{padding-bottom:6rem}
 .atalhos small{font-weight:normal;font-size:.78rem;color:#444;text-align:center}
 .envio{background:#fff;border:3px solid #0b4f8a;border-radius:.8rem;padding:.7rem 1rem;margin:.8rem 0}
 @media (min-width:900px){.navbar button{font-size:.85rem}}
+@media (max-width:640px){
+  main h2{font-size:1.05rem;margin-top:.8rem}
+  .aba[data-aba="arvore"] > p.small{font-size:.78rem;margin:.3rem 0}
+  #grafoBotoes{gap:.3rem;margin:.3rem 0}
+  #grafoBotoes button{min-height:2.3rem;padding:.25rem .55rem;font-size:.8rem}
+  #grafo{height:62vh!important;min-height:20rem!important}
+  .navbar button{font-size:.62rem}
+  .navbar button span{font-size:1.3rem}
+}
 @media print{.legend,.bar,.navbar,.tools,button{display:none!important}body{padding:0}.aba{display:block!important}}
 </style>
 </head>
@@ -154,13 +163,12 @@ body{padding-bottom:6rem}
 
 <section class="aba" data-aba="arvore">
 <h2 id="arvoreTopo">🌳 Árvore da família (toque para abrir e fechar)</h2>
-<p class="small">Os netos estão à <b>esquerda</b>. Cada linha leva aos pais, avós, bisavós… Toque no <b>botão redondo ＋</b> para abrir um ramo e no <b>－</b> para fechar. Toque no <b>nome</b> para ver os detalhes. Arraste para andar pela árvore e use os botões de zoom (ou dois dedos) para aproximar.</p>
+<p class="small"><b>＋</b> abre um ramo, <b>－</b> fecha. Toque no <b>nome</b> para ver detalhes. Arraste para andar; use dois dedos ou os botões para aproximar.</p>
 <div class="tools" id="grafoBotoes">
-  <button onclick="grafoZoom(1.3)">🔍 Aproximar</button>
-  <button onclick="grafoZoom(1/1.3)">Afastar</button>
+  <button onclick="grafoZoom(1.3)" aria-label="Aproximar">🔍＋</button>
+  <button onclick="grafoZoom(1/1.3)" aria-label="Afastar">🔍－</button>
   <button onclick="grafoAbrirTudo()">Abrir tudo</button>
-  <button onclick="grafoRecolher()">Recolher</button>
-  <button onclick="grafoCentralizar()">↺ Voltar ao começo</button>
+  <button onclick="grafoCentralizar()">↺ Recolher e voltar</button>
 </div>
 <div id="grafo" style="height:75vh;min-height:24rem;border:3px solid #2d2a26;border-radius:.8rem;background:#fffdf8;overflow:hidden;touch-action:none"></div>
 <div class="legend" style="position:static;border:0;background:none;padding:.4rem 0"><div>

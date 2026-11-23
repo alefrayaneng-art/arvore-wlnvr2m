@@ -872,6 +872,37 @@ var FSNOTA = {
   G.valentina.unshift(["Tetravós (pais do Aristides)",[["domingosrosa"]]]);
   ANEIS[4][0]="domingosrosa";
   LP.domingosrosa=[0];
+  // achados de 23/11, 01h18 (imagens baixadas e lidas)
+  P.manoel.d="12/05/1929 a 11/11/1995. Nasceu “Manoel Aristides da Rosa”";
+  P.manoel.sabe=["Registro de óbito lido (1995): aposentado, casado com Maria Almecinda de Jesus, deixou 10 filhos. Sepultado no cemitério de Cangueri.","ACHADO: a certidão de casamento dele (Imaruí, 14/05/1946) mostra que ele se chamava MANOEL ARISTIDES DA ROSA. Em 1956, por ordem da Justiça (comarca de Laguna), o nome foi mudado para MANOEL VALENTINA, e a data de nascimento foi corrigida para 12/05/1929.","É a prova de que o sobrenome da família era “da Rosa” e virou “Valentina”, ao que parece pelo nome da mãe dele, Valentina Inês."];
+  P.manoel.falta=["Saber por que ele pediu a mudança de nome em 1956 (o processo deve estar no Fórum de Laguna)."];
+  P.manoel.q="Alguém sabe por que o bisavô Manoel trocou “da Rosa” por “Valentina”?";
+  P.almecinda.d="Nasceu em 1928. Esposa de Manoel. Viva, segundo o caderno";
+  P.almecinda.s="c";
+  P.almecinda.sabe=["Certidão de casamento lida (Imaruí, 1946): Maria Almecinda de Jesus, doméstica, moradora de Cangueri, nascida em 1928.","Filha de Marcolino Abil(?) de Oliveira e Almecinda Jardina(?) de Jesus.","O nome também está no óbito do marido (1995)."];
+  P.almecinda.falta=["Confirmar se ainda vive e onde mora (o caderno diz que tem 98 anos)."];
+  P.marcolinooliv=T("Marcolino Abil de Oliveira e Almecinda Jardina de Jesus","Pais da bisavó Maria Almecinda (Cangueri, Imaruí/SC)","c",["Aparecem como pais da Maria Almecinda na certidão de casamento dela (1946). A letra do segundo nome de cada um está difícil de ler (“Abil”? “Jardina”?)."],["Grafia certa dos nomes.","Datas e óbitos."],"Alguém de Cangueri lembra do Marcolino ou da dona Almecinda?");
+  CURTO.marcolinooliv="Marcolino e Almecinda";
+  P.aristides.s="c";
+  P.aristides.d="Por volta de 1907 a 19/01/1973. Lavrador, morava em Itapeva (Imaruí/SC)";
+  P.aristides.sabe=["Consta como pai de Manoel no óbito de 1995 e na certidão de casamento de 1946.","Óbito lido (1973): morreu num acidente, no hospital de Imaruí, com 66 anos, casado. Filho de Domingos (Gomes?) da Rosa e Rosa Sergina Ana de Jesus. Sepultado em Cangueri.","Quem registrou o óbito foi Antônio Aristides da Rosa, provavelmente um filho. Seria o “Antônio Rosa” do caderno da vó Irani?"];
+  P.aristides.falta=["Saber com quem ele era casado em 1973."];
+  P.domingosrosa.s="c";
+  P.domingosrosa.sabe=["Aparecem como pais do Aristides no óbito dele (1973), que foi lido."];
+  P.domingosrosa.falta=["A grafia do sobrenome do Domingos (Gomes?).","Datas e lugares."];
+  P.miguel.d="14/04/1907 (Diamante/PB) a 06/10/1993 (Ibiara/PB)";
+  P.miguel.sabe=["Óbito lido (1993, Ibiara/PB): nasceu em Diamante, era aposentado, casado, deixou 5 filhos. Filho de Mariano Rodrigues e Maria Alexandre. Sepultado no cemitério Santa Maria, em Ibiara.","Quem registrou foi o filho Severino Mariano.","No óbito da Julieta (1977) aparece como “natural da Paraíba, agricultor”."];
+  P.miguel.falta=["Ele casou depois de 1977? O óbito cita um casamento (nº 533). Com quem?"];
+  P.marianorod.s="c";
+  P.marianorod.sabe=["Aparecem como pais do Miguel no óbito dele (1993), que foi lido."];
+  G.valentina.splice(1,0,["Pais da bisavó Maria Almecinda",[["marcolinooliv"]]]);
+  ANEIS[3][2]="marcolinooliv"; ANEIS[3][3]="marcolinooliv";
+  LUG[12][5]="Terra do ramo “Pinto Ramalho”. O bisavô Miguel Mariano morreu aqui em 1993 e foi sepultado no cemitério Santa Maria.";
+  LUG[12][4]="c"; LUG[12][6]="Óbito do Miguel Mariano (1993)";
+  LUG[0][5]="Berço dos Valentina. O bisavô Manoel (que nasceu “Manoel Aristides da Rosa”) casou aqui com Maria Almecinda em 1946 e mudou o nome para Valentina em 1956. Valmor nasceu aqui (1951). Aristides morreu aqui em 1973 e Manoel em 1995, os dois sepultados em Cangueri.";
+  LUG[0][6]="Certidão de casamento (1946, com a retificação de 1956), óbitos de Aristides (1973) e Manoel (1995)";
+  LP.miguel=[14,15,12]; LP.marcolinooliv=[0];
+  HIST.forEach(function(h){ if(/sobrenome “Valentina”/.test(h.t)){ h.x="AGORA TEMOS A PROVA. A certidão de casamento do bisavô Manoel (Imaruí, 1946) diz que ele se chamava Manoel Aristides da Rosa, filho de Aristides Domingos da Rosa e Valentina Inês da Conceição. Numa anotação de 1956, o cartório registra que a Justiça mandou mudar o nome dele para MANOEL VALENTINA. Ou seja: o sobrenome da família era “da Rosa”, e “Valentina” veio do nome da mãe dele."; h.q="Alguém sabe por que ele mudou de nome? Foi para homenagear a mãe?"; h.t="🔤 De onde vem o sobrenome “Valentina” (RESOLVIDO!)"; } });
   // tarefas novas
   TAREFAS.push(["Foto reta e com boa luz de cada página do caderno da vó Irani","Algumas partes estão borradas, como o começo da página dos 18 filhos."]);
   TAREFAS.push(["Saber se a Laura era irmã do vô Hilário, e o nome completo da Nena","Ajuda a entender a história do primo do Lula."]);

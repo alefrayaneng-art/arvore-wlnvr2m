@@ -474,6 +474,8 @@ function abrir(id){
   var lk='<button type="button" onclick="verNaArvore(\''+id+'\')">🌳 Ver na árvore</button>';
   if(RODA_IDS[id]) lk+='<button type="button" onclick="verNaRoda(\''+id+'\')">⭕ Ver na roda</button>';
   if(LP[id]) lk+='<button type="button" onclick="verNoMapa(\''+id+'\')">🗺️ Ver no mapa</button>';
+  (FS[id]||[]).forEach(function(f){ lk+='<a class="btn" style="text-decoration:none;display:inline-block" target="_blank" rel="noopener" href="https://ancestors.familysearch.org/pt/'+f[0]+'">🌐 '+f[1]+'</a>'; });
+  if(FS[id]) lk+='<p class="small" style="width:100%;margin:.2rem 0 0">O FamilySearch é um site gratuito de árvores. '+(FSNOTA[id]||'A página abre em outra aba.')+'</p>';
   document.getElementById("pLinks").innerHTML=lk;
   document.getElementById("rNome").value=S.nome||"";
   document.getElementById("rTexto").value="";
@@ -726,6 +728,33 @@ function verRamo(r){
 
 var fs=20;
 function zoom(d){ fs=Math.max(16,Math.min(30,fs+d)); document.documentElement.style.setProperty("--fs",fs+"px"); }
+/* ===== PÁGINAS PÚBLICAS NO FAMILYSEARCH (só de pessoas falecidas) ===== */
+var FS = {
+ julieta:[["GHRM-LKY","Ver a Julieta no FamilySearch"]],
+ virgulina:[["GHMT-HXL","Ver a Virgulina no FamilySearch"]],
+ manoeljose:[["GHR9-QMG","Ver o Manoel José no FamilySearch"]],
+ miguel:[["GFPD-L4F","Ver o Miguel Mariano no FamilySearch"]],
+ eduardo:[["L2QG-NPH","Ver o Eduardo"],["G4BG-THP","Ver a Casimira"]],
+ marianorod:[["GLR1-RXC","Ver o Mariano Rodrigues"],["GLR1-1YM","Ver a Maria Alexandre"]],
+ estendeslau:[["GHRN-B7Q","Ver o Estendeslau"],["GHRJ-MSK","Ver a Rita"]],
+ manoel:[["PJ6R-MVJ","Ver o Manoel Valentina no FamilySearch"]],
+ aristides:[["PJ6R-3TT","Ver o Aristides no FamilySearch"]],
+ valentinaines:[["PJ65-JJL","Ver a Valentina Inês no FamilySearch"]],
+ joseign:[["GVSB-4D5","Ver o José Ignácio no FamilySearch"]],
+ guiomar:[["GVSB-CVB","Ver a Guiomar no FamilySearch"]],
+ justino:[["KCK1-HNG","Ver o Justino no FamilySearch"]],
+ balduina:[["K4RV-3J8","Ver a Balduína no FamilySearch"]],
+ manoelcampos:[["974T-NYJ","Ver o Manoel Ignácio Campos"],["974T-NYT","Ver a Maria de Jesus"]]
+};
+var FSNOTA = {
+ julieta:"Esta página foi montada por parentes Ramalho (Rubens e Jussara Ramalho), e o Alef anexou o óbito dela. De lá dá para subir a árvore até os Pinto Ramalho. Atenção: os elos mais antigos ainda não têm prova.",
+ virgulina:"Página montada por parentes Ramalho. Os pais e avós que aparecem lá ainda não foram conferidos em documento.",
+ eduardo:"Páginas montadas por outras pessoas. Ainda não têm documento anexado.",
+ manoel:"Página criada pelo Alef, com o registro de óbito anexado.",
+ joseign:"Página criada em 2023, provavelmente pelo Álex.",
+ guiomar:"Página criada em 2023, provavelmente pelo Álex."
+};
+
 /* ===== ATUALIZAÇÃO COM O DOSSIÊ CONSOLIDADO (23/11/2026) ===== */
 (function(){
   function add(id,campo,txt){ if(P[id]) P[id][campo]=(P[id][campo]||[]).concat(txt); }

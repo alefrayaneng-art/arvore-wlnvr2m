@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="googlebot" content="noindex, nofollow">
+<meta property="og:title" content="A história da nossa família">
+<meta property="og:description" content="Toque e ajude a completar a árvore da família.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🌳%3C/text%3E%3C/svg%3E">
+<title>A história da nossa família</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+:root{
+  --ok:#14663a; --ok-bg:#e1f4e7;
+  --ask:#a04a00; --ask-bg:#fff0d6;
+  --ink:#1b1b1b; --bg:#faf7f2; --card:#fff; --line:#cfc7b8; --blue:#0b4f8a;
+  --fs:20px;
+}
+*{box-sizing:border-box}
+html{font-size:var(--fs)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Verdana,Tahoma,Arial,sans-serif;line-height:1.5;padding-bottom:7rem}
+h1{font-size:1.7rem;margin:.2rem 0}
+h2{font-size:1.35rem;margin:2rem 0 .3rem;padding:.4rem .7rem;background:#2d2a26;color:#fff;border-radius:.5rem}
+h3{font-size:1.1rem;margin:.2rem 0}
+main{max-width:62rem;margin:0 auto;padding:0 .8rem}
+header{padding:1rem .8rem .2rem;max-width:62rem;margin:0 auto}
+.intro{background:#fff;border:2px solid var(--line);border-radius:.7rem;padding:.8rem 1rem;margin:.6rem 0}
+.tools{display:flex;gap:.5rem;flex-wrap:wrap;margin:.5rem 0}
+button,.btn{font:inherit;font-size:1rem;border-radius:.6rem;border:2px solid #444;background:#fff;color:#111;padding:.7rem 1rem;min-height:3rem;cursor:pointer}
+button.main,.btn.main{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:bold}
+button:focus-visible,[tabindex]:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:4px solid #ffb300;outline-offset:2px}
+.legend{position:sticky;top:0;z-index:5;background:#fffdf8;border-bottom:3px solid #2d2a26;padding:.5rem .8rem}
+.legend div{max-width:62rem;margin:0 auto;display:flex;gap:1rem;flex-wrap:wrap;align-items:center;font-weight:bold;font-size:.9rem}
+.chip{display:inline-flex;align-items:center;gap:.4rem;padding:.25rem .6rem;border-radius:.5rem}
+.chip.ok{background:var(--ok-bg);border:3px solid var(--ok);color:var(--ok)}
+.chip.ask{background:var(--ask-bg);border:3px dashed var(--ask);color:var(--ask)}
+.gen{margin:1rem 0}
+.gen>.lab{font-weight:bold;color:#555;margin:.2rem 0;font-size:.9rem;text-transform:uppercase;letter-spacing:.04em}
+.row{display:flex;flex-wrap:wrap;gap:.8rem;justify-content:center;align-items:stretch}
+.couple{display:flex;flex-wrap:wrap;gap:.3rem;align-items:center;justify-content:center;background:#efe9dc;border-radius:.8rem;padding:.5rem}
+.couple .amp{font-size:1.6rem;font-weight:bold;color:#555}
+.down{text-align:center;font-size:1.4rem;color:#777;margin:.1rem 0}
+.p{width:15.5rem;max-width:100%;text-align:left;border-radius:.7rem;padding:.6rem .7rem;cursor:pointer;display:block}
+.p.ok{background:var(--ok-bg);border:3px solid var(--ok)}
+.p.ask{background:var(--ask-bg);border:3px dashed var(--ask)}
+.p .nm{font-weight:bold;font-size:1.02rem;line-height:1.25;display:block}
+.p .dt{font-size:.82rem;display:block;margin:.15rem 0}
+.p .st{font-size:.78rem;font-weight:bold;display:block}
+.p.ok .st{color:var(--ok)} .p.ask .st{color:var(--ask)}
+.p .tap{font-size:.78rem;color:#444;display:block;margin-top:.2rem}
+.note{background:#fff;border-left:6px solid var(--ask);padding:.5rem .8rem;margin:.6rem 0;border-radius:.4rem;font-size:.92rem}
+.story{background:#fff;border:3px dashed var(--ask);border-radius:.8rem;padding:.7rem 1rem;margin:.7rem 0}
+.story h3{color:var(--ask)}
+.check{display:flex;gap:.7rem;align-items:flex-start;background:#fff;border:2px solid var(--line);border-radius:.7rem;padding:.6rem .8rem;margin:.5rem 0}
+.check input{width:2rem;height:2rem;flex:none;margin-top:.2rem}
+.check small{display:block;color:#555}
+dialog{border:4px solid #2d2a26;border-radius:1rem;max-width:40rem;width:94vw;padding:1rem;font-size:1rem}
+dialog::backdrop{background:rgba(0,0,0,.55)}
+dialog h2{margin:0 0 .4rem;font-size:1.3rem;background:none;color:var(--ink);padding:0}
+dialog ul{margin:.2rem 0 .6rem 1.1rem;padding:0}
+label{display:block;font-weight:bold;margin:.7rem 0 .2rem}
+input[type=text],textarea,select{width:100%;font:inherit;font-size:1rem;padding:.6rem;border:2px solid #444;border-radius:.5rem;background:#fff}
+textarea{min-height:7rem}
+.opts{display:flex;flex-direction:column;gap:.4rem}
+.opts label{font-weight:normal;display:flex;gap:.6rem;align-items:center;background:#f3f0ea;border:2px solid var(--line);border-radius:.6rem;padding:.6rem;margin:0}
+.opts input{width:1.6rem;height:1.6rem}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#2d2a26;color:#fff;padding:.6rem .8rem;display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;justify-content:center;z-index:9}
+.bar span{font-weight:bold}
+.mine{background:#fff;border:2px solid var(--line);border-radius:.6rem;padding:.5rem .8rem;margin:.4rem 0}
+.mine button{min-height:2.4rem;padding:.3rem .7rem;font-size:.85rem}
+.small{font-size:.85rem;color:#444}
+.flash{animation:flash 1s ease-in-out 3;outline:6px solid #ffb300!important;outline-offset:3px}
+@keyframes flash{50%{outline-color:#ff3d00}}
+#roda svg{display:block;margin:0 auto}
+#roda path{cursor:pointer;stroke:#fff;stroke-width:2}
+#roda path:hover,#roda path:focus{opacity:.8}
+#roda path.hl{stroke:#ffb300;stroke-width:8;animation:hl 1s ease-in-out 4}
+@keyframes hl{50%{stroke:#ff3d00}}
+#roda text{pointer-events:none;font-family:Verdana,Tahoma,Arial,sans-serif}
+@media (max-width:640px){
+  .legend{position:static}
+  .bar{padding:.35rem .5rem;gap:.35rem}
+  .bar span{width:100%;text-align:center;font-size:.8rem}
+  .bar button{flex:1;min-height:2.7rem;padding:.3rem .4rem;font-size:.9rem}
+  body{padding-bottom:8rem}
+  .p{width:100%}
+}
+@media print{.legend,.bar,.tools,button{display:none!important}body{padding:0}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🌳 A história da nossa família</h1>
+  <div class="intro">
+    <p style="margin:.2rem 0"><b>Olá!</b> Estamos montando a árvore da nossa família e precisamos da ajuda de vocês. Cada pessoa tem um quadradinho. <b>Toque no quadradinho</b> para ver o que já sabemos e para nos contar o que você sabe.</p>
+    <p style="margin:.2rem 0"><b>Não precisa saber tudo.</b> Um nome, uma data, uma cidade ou uma lembrança já ajudam muito.</p>
+    <div class="tools">
+      <button onclick="zoom(2)" aria-label="Aumentar a letra">🔍 Letra maior</button>
+      <button onclick="zoom(-2)" aria-label="Diminuir a letra">Letra menor</button>
+      <button onclick="abrirNovo()" class="main">➕ Contar de um parente que não está aqui</button>
+      <button onclick="window.print()">🖨️ Imprimir</button>
+    </div>
+    <p style="margin:.4rem 0 .2rem"><b>Três jeitos de ver a família</b> (toque para ir):</p>
+    <div class="tools">
+      <button onclick="ir('g-nucleo')">🌳 Árvore</button>
+      <button onclick="ir('roda')">⭕ Roda da família</button>
+      <button onclick="ir('mapa')">🗺️ Mapa das cidades</button>
+    </div>
+  </div>
+</header>
+
+<div class="legend"><div>
+  <span class="chip ok">✔ VERDE = já temos documento (certidão, registro)</span>
+  <span class="chip ask">? LARANJA = ainda é o que a família conta. Falta confirmar</span>
+</div></div>
+
+<main>
+
+<h2>1. Nossa família hoje</h2>
+<div id="g-nucleo"></div>
+
+<h2>2. Lado do pai (Silvano): família Valentina, de Santa Catarina</h2>
+<div id="g-valentina"></div>
+
+<h2>3. Lado do pai (Silvano): família Santos e Campos, do Ceará, da Bahia e de São Paulo</h2>
+<div id="g-santos"></div>
+
+<h2>4. Lado da mãe (Celiane): família Ramalho e Xavier, da Paraíba</h2>
+<div id="g-ramalho"></div>
+
+<h2>5. Roda da família</h2>
+<p class="small">Os netos estão no <b>centro</b>. Cada anel para fora é uma geração mais antiga: pais, avós, bisavós, trisavós. O lado <b>esquerdo</b> é a família do pai (Silvano) e o <b>direito</b>, a da mãe (Celiane). <b>Toque em um pedaço</b> para ver a pessoa. Os pedaços <b>cinza com “?”</b> são pessoas que ainda não sabemos quem são: toque e conte, se souber!</p>
+<div class="tools">
+  <button onclick="zoomRoda(1)">🔍 Ampliar a roda</button>
+  <button onclick="zoomRoda(-1)">Diminuir</button>
+</div>
+<div id="rodaBox" style="overflow:auto;border:3px solid #2d2a26;border-radius:.8rem;background:#fff;text-align:center"><div id="roda"></div></div>
+<div class="legend" style="position:static;border:0;background:none;padding:.4rem 0"><div>
+  <span class="chip ok">✔ com documento</span><span class="chip ask">? falta confirmar</span><span class="chip" style="background:#eee;border:3px dotted #888;color:#555">? ainda não sabemos quem é</span>
+</div></div>
+
+<h2>6. Mapa: por onde a nossa família passou</h2>
+<p class="small">Cada alfinete é uma cidade que aparece nos documentos ou nas histórias. <b>Toque no alfinete</b> para ver o que aconteceu ali e qual é a prova. As linhas mostram o caminho de cada ramo da família ao longo dos anos.</p>
+<div class="tools" id="filtros">
+  <button onclick="verRamo('todos')" class="main">Todos</button>
+  <button onclick="verRamo('valentina')">🟦 Valentina (SC)</button>
+  <button onclick="verRamo('santos')">🟪 Santos e Campos</button>
+  <button onclick="verRamo('ramalho')">🟫 Ramalho e Xavier</button>
+</div>
+<div id="mapa" style="height:70vh;min-height:22rem;border:3px solid #2d2a26;border-radius:.8rem;background:#e8eef2"></div>
+<p class="small" id="mapaAviso" style="display:none">O mapa precisa de internet para aparecer. Enquanto isso, veja a lista de lugares abaixo.</p>
+<details style="margin:.6rem 0"><summary style="font-weight:bold;cursor:pointer;padding:.5rem 0">📋 Ver a lista de lugares (sem mapa)</summary><div id="listaLugares"></div></details>
+
+<h2>7. Histórias que a família conta (ainda sem prova)</h2>
+<p class="small">Estas histórias são bonitas, mas ainda <b>não têm documento</b>. Elas ficam em laranja até a gente achar a prova. Se você ouviu alguma delas, conte para nós de quem ouviu.</p>
+<div id="historias"></div>
+
+<h2>8. O que podemos conseguir juntos</h2>
+<p class="small">Marque ✔ o que você <b>já tem em casa</b>. Pode mandar uma foto pelo WhatsApp. Foto de certidão, de RG ou de foto antiga com nome escrito atrás também serve.</p>
+<div id="tarefas"></div>
+
+<h2>9. Suas respostas</h2>
+<div id="minhas"></div>
+</main>
+
+<div class="bar">
+  <span id="cont">Nenhuma resposta ainda</span>
+  <button class="main" onclick="enviarZap()">📲 Enviar pelo WhatsApp</button>
+  <button onclick="copiar()">📋 Copiar</button>
+</div>
+
+<!-- Janela da pessoa -->
+<dialog id="dlgPessoa">
+  <h2 id="pNome"></h2>
+  <p id="pSt" class="small"></p>
+  <b>O que já sabemos:</b><ul id="pSabe"></ul>
+  <b>O que ainda falta:</b><ul id="pFalta"></ul>
+  <p id="pPerg" class="note"></p>
+  <div id="pLinks" class="tools"></div>
+  <form id="fPessoa" onsubmit="return guardarPessoa(event)">
+    <label>Seu nome</label>
+    <input type="text" id="rNome" placeholder="Ex.: Tia Maria" autocomplete="name">
+    <label>O que você quer dizer?</label>
+    <div class="opts">
+      <label><input type="radio" name="rTipo" value="CONFIRMO" checked> ✔ Está certo, eu confirmo</label>
+      <label><input type="radio" name="rTipo" value="CORRIJO"> ✏️ Tem algo errado, eu corrijo</label>
+      <label><input type="radio" name="rTipo" value="ACRESCENTO"> ➕ Eu sei mais coisas sobre essa pessoa</label>
+    </div>
+    <label>Escreva aqui (pode ser curto)</label>
+    <textarea id="rTexto" placeholder="Ex.: Ela nasceu em tal cidade. O apelido dela era..."></textarea>
+    <div class="tools" style="margin-top:.8rem">
+      <button type="submit" class="main">✔ Guardar minha resposta</button>
+      <button type="button" onclick="fechar('dlgPessoa')">Fechar</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Janela novo parente -->
+<dialog id="dlgNovo">
+  <h2>➕ Um parente que não está na árvore</h2>
+  <form onsubmit="return guardarNovo(event)">
+    <label>Seu nome</label>
+    <input type="text" id="nNome" autocomplete="name">
+    <label>Nome da pessoa (como você lembra)</label>
+    <input type="text" id="nPessoa" placeholder="Ex.: Tio Zé, Maria da Silva">
+    <label>Quem é essa pessoa para nós?</label>
+    <select id="nRel">
+      <option>Não sei explicar</option><option>Irmão ou irmã de alguém da família</option><option>Pai ou mãe de alguém da família</option>
+      <option>Avô ou avó de alguém da família</option><option>Tio ou tia</option><option>Primo ou prima</option>
+      <option>Sobrinho ou sobrinha</option><option>Marido ou esposa</option><option>Outro parente</option>
+    </select>
+    <label>De quem ela é parente? (nome)</label>
+    <input type="text" id="nDe" placeholder="Ex.: do vô Hilário">
+    <label>Onde nasceu ou morou? Quando (mais ou menos)?</label>
+    <input type="text" id="nOnde" placeholder="Ex.: Diamante, Paraíba, por volta de 1950">
+    <label>Quem mais sabe dela? Algum telefone?</label>
+    <input type="text" id="nQuem">
+    <div class="tools" style="margin-top:.8rem">
+      <button type="submit" class="main">✔ Guardar</button>
+      <button type="button" onclick="fechar('dlgNovo')">Fechar</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+/* Número do WhatsApp de quem recebe as respostas, com 55 + DDD (ex.: "5511999999999").
+   Se ficar vazio, o WhatsApp abre e a pessoa escolhe o contato. */
+var ZAP = "5519997957925";
+
+/* ===== DADOS ===== */
+// c = confirmado com documento; p = ainda não confirmado
+var P = {
+ silvano:{n:"Silvano Valmor Valentina",d:"Nasceu em Joinville/SC",s:"c",
+  sabe:["É filho de Valmor e Irani (consta no RG dele).","Casou no civil com Celiane (registro em Alto Paraíso/RO)."],
+  falta:["Certidão de nascimento (data e cartório exatos)."],q:"Você tem a certidão de nascimento do Silvano?"},
+ celiane:{n:"Celiane Ramalho de Souza Valentina",d:"Nasceu em 30/08/1974, no Sítio Sabonete, Diamante/PB",s:"c",
+  sabe:["Certidão de nascimento lida: filha de Hilário Xavier de Souza e Juracy Ramalho de Souza.","Registro feito em 1976 no cartório de Boa Ventura/PB."],
+  falta:["Certidão de casamento de Hilário e Juracy."],q:"Alguém sabe por que o registro só foi feito em 1976?"},
+ alef:{n:"Alef Rayan Souza Valentina",d:"Nasceu em 06/05/1994, Ariquemes/RO",s:"c",sabe:["Certidão de nascimento conferida."],falta:[],q:""},
+ irmaos:{n:"Alyson, Álex e Adrian",d:"Filhos de Silvano e Celiane",s:"p",
+  sabe:["Os nomes e os pais estão certos.","Alyson: nasceu em 21/07/1995, Alto Paraíso/RO (casamento publicado em 2020)."],
+  falta:["Cópia da certidão de nascimento de cada um (confirmar datas)."],q:"Quem tem as certidões deles em casa?"},
+
+ aristides:{n:"Aristides Domingos da Rosa",d:"Natural de Cangueri, Imaruí/SC",s:"c",
+  sabe:["Consta como pai de Manoel Valentina no óbito de 1995."],falta:["Quando nasceu e morreu.","Quem eram os pais dele."],q:"Alguém em SC lembra dele? Ele tinha o apelido “Toda”?"},
+ valentinaines:{n:"Valentina Inês da Conceição",d:"Santa Catarina",s:"c",
+  sabe:["Consta como mãe de Manoel Valentina no óbito de 1995.","Pode ser dela a origem do nosso sobrenome “Valentina”."],falta:["Quando nasceu e morreu.","Quem eram os pais dela."],q:"A família lembra de uma bisavó chamada Valentina? Ela era chamada de Tintina?"},
+ manoel:{n:"Manoel Valentina",d:"12/05/1929 a 11/11/1995. Morou em Cangueri, Imaruí/SC",s:"c",
+  sabe:["Registro de óbito lido: aposentado, casado com Maria Almecinda de Jesus, deixou 10 filhos.","Foi sepultado no cemitério de Cangueri."],
+  falta:["Certidão de nascimento (Imaruí, 1929).","Pelo caderno da vó Irani, o pai dele seria “Antônio Rosa” e a mãe “Constantina”. Isso é diferente do óbito (Aristides e Valentina Inês). Precisamos entender."],
+  q:"Manoel foi criado por outro pai (“pai de criação”)? Quem lembra dessa história?"},
+ almecinda:{n:"Maria Almecinda de Jesus",d:"Esposa de Manoel. A família escreve também “Almesinda”",s:"c",
+  sabe:["O nome está no óbito do marido (1995)."],
+  falta:["O caderno da vó Irani diz que ela ainda está viva, com 98 anos. Precisamos confirmar.","Grafia certa do nome (Almecinda, Almerinda ou Almesinda)."],q:"Ela ainda vive? Em que cidade? Alguém tem um RG ou foto dela?"},
+ valmor:{n:"Valmor Manoel Valentina",d:"Nasceu em 1951, Imaruí/SC",s:"c",
+  sabe:["Documento de 1971 (Diário da Justiça de SC): nasceu em Imaruí, filho de Manoel e Maria.","Casou-se com Irani em 1971 em Florianópolis."],
+  falta:["Certidão de nascimento e de casamento (grafia correta do nome)."],q:"Tem a certidão de casamento de 1971 em casa?"},
+ irmaosvalmor:{n:"Irmãos do Valmor (10 filhos de Manoel e Maria)",d:"Segundo o caderno da vó Irani",s:"p",
+  sabe:["José Rosa, Lorival (falecido), Lorena, Madalena (“Preta”), Helena, Filomena (“Mena”), Bernadete (“Det”), Antônio (“Nica”), Guiomar (morreu bebê) e Joaquim (“Kinca”).","Dá 10 nomes, o mesmo número do óbito de Manoel. É um bom sinal."],
+  falta:["Datas de nascimento e cidades de cada um.","Quem mais tem filhos e netos?"],q:"Falta alguém? Está errado algum nome?"},
+
+ antonio:{n:"Antônio Ignácio dos Santos",d:"Ceará (Brejo dos Santos, hoje Brejo Santo)",s:"c",
+  sabe:["Consta como pai de José no casamento de 1937."],falta:["Datas e quem eram os pais dele."],q:""},
+ joaquina:{n:"Joaquina Maria da Conceição",d:"Brejo dos Santos/CE",s:"c",
+  sabe:["Consta como mãe de José no casamento de 1937."],falta:["Datas e quem eram os pais dela."],q:""},
+ justino:{n:"Justino Campos Bahia",d:"Nasceu em 1872, Bom Jesus das Minas/BA (hoje Brumado)",s:"c",
+  sabe:["Consta como pai de Guiomar no casamento de 1937.","O caderno da vó Irani diz que ele nasceu em Caitité/BA e era “dono do cartório” (a confirmar)."],
+  falta:["Onde nasceu de verdade: Caitité ou Brumado?","Óbito."],q:"Ele foi dono de cartório? Em que cidade?"},
+ balduina:{n:"Balduína Angélica da Silva",d:"Nasceu em 1897, Bom Jesus dos Meiras/BA",s:"c",
+  sabe:["Consta como mãe de Guiomar no casamento de 1937.","Segundo o caderno, ficou viúva e veio com os filhos Guiomar, Paulino e Justino."],
+  falta:["Óbito e data de nascimento exata."],q:"Alguém lembra da bisavó Balduína?"},
+ marcolino:{n:"Manoel Marcolino da Silva e Jesuíne Angélica da Silva",d:"Pais de Balduína (segundo o caderno da vó Irani)",s:"p",
+  sabe:["Filhos: José, Miguel, Elisipero, Balduína, Otacília, Maria e Bernardina.","Conta-se que Manoel morreu atravessando o Rio São Francisco com uma tropa de animais; Jesuíne veio viúva com todos os filhos."],
+  falta:["Nenhum documento ainda. É só o que a família lembra."],q:"Para onde Jesuíne se mudou depois de viúva?"},
+ manoelcampos:{n:"Manoel Ignácio Campos e Maria de Jesus",d:"Pais do Justino. Bom Jesus das Minas/BA (hoje Brumado)",s:"p",
+  sabe:["Segundo perfis feitos por outras pessoas no FamilySearch: Manoel (1851 a 1890) e Maria (1849 a 1890), casados em 1871."],
+  falta:["Ainda não conferimos os documentos desses perfis."],q:"Alguém da Bahia lembra desses nomes?"},
+ joseign:{n:"José Ignácio dos Santos",d:"31/01/1913 a 06/05/1995. Nasceu no Ceará (Brejo Santo ou Crato)",s:"c",
+  sabe:["Certidão de casamento de 1937 lida.","Lavrador. Morreu em 06/05/1995."],falta:["Onde nasceu: Brejo Santo ou Crato? Certidão de nascimento.","Irmãos: o caderno fala em 3 irmãos."],q:"Quem eram os 3 irmãos do José?"},
+ guiomar:{n:"Guiomar Campos dos Santos",d:"08/03/1918 a 20/05/2008. Nasceu em Caitité/BA",s:"c",
+  sabe:["Casou com José em 14/08/1937, em Quintana (Glicério/SP).","Morreu em Alto Paraíso/RO."],falta:["Os irmãos dela: o caderno fala em 3 (Guiomar, Paulino e Justino são os filhos da Balduína)."],q:"A história de que ela tinha ascendência indígena ou francesa é verdade? Quem contou?"},
+ irmaosirani:{n:"Irmãos da Irani (18 filhos de José e Guiomar)",d:"Segundo o caderno da vó Irani",s:"p",
+  sabe:["Anania (1939), Amaniar (1940) e Irandir (1946) morreram bebês em Parnaso/SP. Estes três têm registro.","Os outros, pelo caderno: Débora (72), Natanael (74), Paulo (73), Guiomar (69), Justino e Silas (vivos); José e Samuel (falecidos); Iracema, Ananias e Dagmar (bebê)."],
+  falta:["A lista tem nomes repetidos (3 “Ananias”) e a ordem não está clara.","Datas, cidades e cônjuges."],q:"Alguém sabe a ordem certa dos 18 irmãos?"},
+ irani:{n:"Irani Inácio dos Santos",d:"Nasceu em 1944, Parnaso (distrito de Tupã/SP)",s:"c",
+  sabe:["Documento de 1971: filha de José Inácio dos Santos e de uma Campos dos Santos.","Professora. Foi quem anotou tudo no caderno que ajudou esta árvore."],
+  falta:["Certidão de nascimento (confirmar a data)."],q:""},
+
+ hilario:{n:"Hilário Xavier de Souza",d:"Paraíba. Morou em Boa Ventura, Diamante e depois em Rondônia",s:"c",
+  sabe:["Consta como pai da Celiane (certidão e RG).","Casou com Juracy em 26/01/1969, em Itaporanga/PB (registro encontrado)."],
+  falta:["Certidão de nascimento e de casamento.","Os irmãos: Assis, “Tota” (falecido em 2026), Naldo, Diassis e talvez Laura."],q:"Laura era irmã do vô Hilário? E quem eram “Cosme e Damião”?"},
+ juracy:{n:"Juracy Ramalho de Souza",d:"Nasceu por volta de 1946, Paraíba",s:"c",
+  sabe:["Consta como mãe da Celiane. É o nome que aparece escrito com “y”.","No óbito da mãe dela (1977) aparece como filha, com 31 anos."],
+  falta:["Certidão de nascimento e de casamento."],q:"Qual o dia do aniversário da vó Juracy?"},
+ manoelxavier:{n:"Manoel Xavier de Souza",d:"Paraíba (Boa Ventura/Diamante)",s:"c",
+  sabe:["Consta como pai do Hilário na certidão da Celiane."],falta:["Data e local de nascimento e de morte.","Quem eram os pais dele. Ainda não sabemos."],q:"Alguém sabe de onde veio a família Xavier?"},
+ candida:{n:"Cândida Maria da Conceição",d:"Paraíba. “Dona Cândida”",s:"c",
+  sabe:["Consta como mãe do Hilário na certidão da Celiane."],falta:["Datas, local e quem eram os pais dela."],q:"A sobrinha Leonice é neta mais velha dela. Quem mais tem foto?"},
+ miguel:{n:"Miguel Mariano",d:"Paraíba. Pai da Juracy",s:"c",
+  sabe:["Consta como pai da Juracy e como declarante do óbito da Julieta (1977)."],falta:["Nome completo, nascimento (por volta de 1907) e morte."],q:"Miguel Mariano tinha outro sobrenome?"},
+ julieta:{n:"Julieta Ramalho de Sousa",d:"10/01/1905 (Bonito de Santa Fé/PB) a 23/02/1977 (Boa Ventura/PB)",s:"c",
+  sabe:["Registro de óbito lido: filha de Manoel José de Souza e Virgulina Ramalho de Sousa.","Filhos: Expedito, José Mariano, Juracy e Severino."],falta:["Certidão de batismo (1905).","Estado civil (era “companheira” de Miguel?)."],q:"Os irmãos da vó Juracy ainda têm descendentes? Onde moram?"},
+ manoeljose:{n:"Manoel José de Souza",d:"Paraíba",s:"c",
+  sabe:["Pai da Julieta (óbito dela, 1977). Casou com Virgulina por volta de 1907, em Conceição/PB."],falta:["Nascimento, morte e pais."],q:""},
+ virgulina:{n:"Virgulina Ramalho de Sousa",d:"1872 a 1958 (segundo árvore pública)",s:"c",
+  sabe:["Mãe da Julieta (óbito dela, 1977)."],falta:["Os documentos dela (óbito de 1958).","Os 6 filhos: José (1896), Julieta (1905), João (1916)…"],q:""},
+ eduardo:{n:"Eduardo Alexandre Pinto Ramalho e Casimira Maria da Conceição",d:"Pais de Virgulina (segundo árvores públicas na internet)",s:"p",
+  sabe:["Eduardo: 1833 a 1892. Daí a linha sobe até o Capitão José Pinto Ramalho (1713-1782)."],
+  falta:["Nenhum documento confirmou esses elos. É só uma árvore feita por outras pessoas.","Algumas datas das gerações antigas não batem."],q:"Alguém na família ouviu falar de “Pinto Ramalho”?"},
+ irmaosjuracy:{n:"Irmãos da Juracy",d:"Filhos de Miguel e Julieta",s:"c",
+  sabe:["Expedito, José Mariano e Severino (aparecem no óbito da mãe, 1977)."],falta:["Onde moraram e se têm filhos e netos."],q:"Algum deles ainda vive? Tem telefone de algum primo?"},
+ irmaoshilario:{n:"Irmãos do Hilário",d:"Segundo conversas da família",s:"p",
+  sabe:["Assis Xavier, “Tota” (falecido em 14/01/2026), Naldo (“Naldinho”), Diassis. Talvez Laura (falecida em 2026)."],falta:["Lista completa e datas."],q:"Quantos irmãos o vô Hilário teve? Quais os nomes?"},
+ filhoshilario:{n:"Outros filhos de Hilário e Juracy",d:"Irmãos da Celiane",s:"p",
+  sabe:["Lucilene, Maria Neide, Célio, Cícero e Selma (segundo a família)."],falta:["Datas de nascimento e cidades."],q:"Faltou algum irmão ou irmã da Celiane?"}
+};
+
+// Montagem: cada grupo é uma lista de "linhas"; cada linha é uma lista de casais (arrays de ids)
+var G = {
+ nucleo:[["Pais",[["silvano","celiane"]]],["Filhos",[["alef"],["irmaos"]]]],
+ valentina:[["Trisavós (pais do Manoel)",[["aristides","valentinaines"]]],["Bisavós (pais do Valmor)",[["manoel","almecinda"]]],["Avô e avó",[["valmor","irani"]]],["Tios do Silvano",[["irmaosvalmor"]]]],
+ santos:[["Quartos-avós (pais do Justino e da Balduína)",[["manoelcampos"],["marcolino"]]],["Trisavós",[["antonio","joaquina"],["justino","balduina"]]],["Bisavós (pais da Irani)",[["joseign","guiomar"]]],["Avó",[["irani"]]],["Irmãos da Irani",[["irmaosirani"]]]],
+ ramalho:[["Origem mais antiga (a confirmar)",[["eduardo"]]],["Trisavós",[["manoeljose","virgulina"]]],["Bisavós",[["manoelxavier","candida"],["miguel","julieta"]]],["Avô e avó",[["hilario","juracy"]]],["Tios da Celiane",[["irmaosjuracy"],["irmaoshilario"],["filhoshilario"]]]]
+};
+
+var HIST = [
+ {t:"🎸 Parentesco com a cantora Elba Ramalho e o cantor Zé Ramalho",x:"Elba nasceu em Conceição (PB), a mesma cidade onde, em 1907, casaram os bisavós Manoel José e Virgulina Ramalho. Em entrevistas, Elba e o compositor Luiz Ramalho dizem ser “do mesmo Ramalho”. Ainda não sabemos se há ligação com a nossa família.",q:"Alguém ouviu a família falar disso? De quem?"},
+ {t:"🇧🇷 Primo do presidente Lula",x:"Conta-se que um primo do Lula, chamado João Inácio da Silva, casou com a Nena, sobrinha do vô Hilário. Se for verdade, seria parentesco por casamento, e não de sangue. Falta o nome completo da Nena e do marido dela.",q:"Qual o nome inteiro da Nena? Onde ela mora? Quem é a mãe dela?"},
+ {t:"🤠 Lampião e as brigas de terra",x:"A família lembra de disputas de terra do nosso povo contra o bando de Lampião. É uma lembrança antiga, sem documento por enquanto.",q:"Quem contou essa história? O que foi dito?"},
+ {t:"👑 Descendência de nobres franceses",x:"Há quem diga que a família do José Ignácio viria da nobreza francesa. Os documentos que achamos mostram lavradores do Ceará e da Bahia, e nada ligando a isso. Só entra na árvore se aparecer prova.",q:"Quem contou? Havia algum documento ou objeto antigo?"},
+ {t:"🔤 De onde vem o sobrenome “Valentina”",x:"A tradição diz que o sobrenome veio do nome de uma bisavó. O óbito do Manoel mostra que a mãe dele se chamava Valentina Inês e que o pai era “da Rosa”. Isso dá força à tradição.",q:"Alguém sabe por que a família deixou de usar “Rosa”?"}
+];
+
+var TAREFAS = [
+ ["Certidão de casamento do vô Hilário e da vó Juracy","Eles se casaram em 26/01/1969, em Itaporanga/PB. Se não tiver a certidão, vale a data e a igreja onde casaram."],
+ ["Certidão de nascimento do vô Hilário e da vó Juracy","Ela traz o nome completo dos pais e avós. É a chave para voltar mais uma geração."],
+ ["Certidão de casamento do vô Valmor e da vó Irani (1971) e de nascimento do vô Valmor","Foram feitas em Florianópolis. Servem para acertar a grafia dos nomes."],
+ ["Saber se a bisavó Maria Almecinda ainda vive, onde mora e o nome certo","Se tiver RG ou foto, melhor ainda."],
+ ["Nome, data de nascimento e cidade dos 10 irmãos do vô Valmor","Já temos os nomes pelo caderno da vó Irani. Faltam datas, cidades e filhos."],
+ ["Nome e data de nascimento dos irmãos da vó Irani","São 18 filhos. Precisamos da ordem certa."],
+ ["Nome completo da Nena e telefone de quem conheça","Para esclarecer a história do primo do Lula."],
+ ["Fotos antigas com nome escrito atrás","Qualquer foto de avós, bisavós, casamentos, sítios, igrejas."],
+ ["Gravar um áudio contando o que lembra","Pode ser de 1 minuto. Fale os nomes, os apelidos e as cidades."]
+];
+
+/* ===== ESTADO ===== */
+var S = {respostas:[], novos:[], feito:{}, nome:""};
+try{ var sv=localStorage.getItem("arvoreValentina_v1"); if(sv) S=JSON.parse(sv); }catch(e){}
+function salvar(){ try{localStorage.setItem("arvoreValentina_v1",JSON.stringify(S));}catch(e){} }
+
+/* ===== DESENHO ===== */
+function card(id){
+  var p=P[id], ok=p.s==="c";
+  return '<button class="p '+(ok?'ok':'ask')+'" data-id="'+id+'" onclick="abrir(\''+id+'\')">'
+   +'<span class="nm">'+p.n+'</span><span class="dt">'+p.d+'</span>'
+   +'<span class="st">'+(ok?'✔ Confirmado com documento':'? Ainda não confirmado')+'</span>'
+   +'<span class="tap">👆 Toque aqui</span></button>';
+}
+function montar(){
+  Object.keys(G).forEach(function(k){
+    var h="";
+    G[k].forEach(function(lin,i){
+      if(i>0) h+='<div class="down">▼</div>';
+      h+='<div class="gen"><div class="lab">'+lin[0]+'</div><div class="row">';
+      lin[1].forEach(function(c){
+        h+='<div class="couple">';
+        c.forEach(function(id,j){ if(j>0) h+='<span class="amp">&amp;</span>'; h+=card(id); });
+        h+='</div>';
+      });
+      h+='</div></div>';
+    });
+    document.getElementById("g-"+k).innerHTML=h;
+  });
+  document.getElementById("historias").innerHTML=HIST.map(function(h,i){
+    return '<div class="story"><h3>'+h.t+'</h3><p>'+h.x+'</p><p><b>Pergunta:</b> '+h.q+'</p>'
+     +'<button onclick="abrirHist('+i+')">✏️ Eu sei algo sobre isso</button></div>';
+  }).join("");
+  document.getElementById("tarefas").innerHTML=TAREFAS.map(function(t,i){
+    return '<label class="check" style="font-weight:normal"><input type="checkbox" '+(S.feito[i]?'checked':'')+' onchange="marcar('+i+',this.checked)">'
+     +'<span><b>'+t[0]+'</b><small>'+t[1]+'</small></span></label>';
+  }).join("");
+  lista();
+}
+function marcar(i,v){ S.feito[i]=v; salvar(); lista(); }
+
+/* ===== JANELAS ===== */
+var atual=null;
+function li(a){ return a.length? a.map(function(x){return "<li>"+x+"</li>";}).join(""):"<li>Nada por enquanto.</li>"; }
+function abrir(id){
+  var p=P[id]; atual={tipo:"pessoa",id:id,rot:p.n};
+  document.getElementById("pNome").textContent=p.n;
+  document.getElementById("pSt").innerHTML=p.s==="c"?'<span class="chip ok">✔ Confirmado com documento</span>':'<span class="chip ask">? Ainda não confirmado</span>';
+  document.getElementById("pSabe").innerHTML=li(p.sabe);
+  document.getElementById("pFalta").innerHTML=li(p.falta);
+  var q=document.getElementById("pPerg"); q.style.display=p.q?"block":"none"; q.innerHTML="<b>Pergunta:</b> "+p.q;
+  var lk='<button type="button" onclick="verNaArvore(\''+id+'\')">🌳 Ver na árvore</button>';
+  if(RODA_IDS[id]) lk+='<button type="button" onclick="verNaRoda(\''+id+'\')">⭕ Ver na roda</button>';
+  if(LP[id]) lk+='<button type="button" onclick="verNoMapa(\''+id+'\')">🗺️ Ver no mapa</button>';
+  document.getElementById("pLinks").innerHTML=lk;
+  document.getElementById("rNome").value=S.nome||"";
+  document.getElementById("rTexto").value="";
+  document.getElementById("dlgPessoa").showModal();
+}
+function abrirDesconhecido(rot){
+  atual={tipo:"desconhecido",rot:rot};
+  document.getElementById("pNome").textContent=rot;
+  document.getElementById("pSt").innerHTML='<span class="chip" style="background:#eee;border:3px dotted #888;color:#555">? Ainda não sabemos quem é</span>';
+  document.getElementById("pSabe").innerHTML="<li>Ainda nada. Esta pessoa existiu, mas não temos o nome.</li>";
+  document.getElementById("pFalta").innerHTML="<li>O nome, de onde era e, se possível, quando nasceu ou morreu.</li>";
+  var q=document.getElementById("pPerg"); q.style.display="block"; q.innerHTML="<b>Pergunta:</b> Você lembra o nome? Ouviu alguém falar?";
+  document.getElementById("pLinks").innerHTML="";
+  document.getElementById("rNome").value=S.nome||"";
+  document.getElementById("rTexto").value="";
+  document.querySelector('input[name=rTipo][value=ACRESCENTO]').checked=true;
+  document.getElementById("dlgPessoa").showModal();
+}
+/* ===== LIGAÇÕES ENTRE AS VISTAS ===== */
+function ir(id){ var e=document.getElementById(id); if(e) e.scrollIntoView({behavior:"smooth",block:"start"}); }
+function verNaArvore(id){
+  fechar("dlgPessoa");
+  var b=document.querySelector('.p[data-id="'+id+'"]'); if(!b) return;
+  b.scrollIntoView({behavior:"smooth",block:"center"});
+  b.classList.remove("flash"); void b.offsetWidth; b.classList.add("flash");
+  setTimeout(function(){b.classList.remove("flash");},3200);
+}
+function verNaRoda(id){
+  fechar("dlgPessoa");
+  ir("roda");
+  document.querySelectorAll('#roda path[data-id="'+id+'"]').forEach(function(p){
+    p.classList.remove("hl"); void p.getBoundingClientRect(); p.classList.add("hl");
+    setTimeout(function(){p.classList.remove("hl");},4200);
+  });
+}
+function verNoMapa(id){
+  fechar("dlgPessoa");
+  ir("mapa");
+  var ls=LP[id]||[];
+  if(!mapa){ ir("listaLugares"); return; }
+  verRamo("todos");
+  var pts=ls.map(function(i){return [LUG[i][1],LUG[i][2]];});
+  setTimeout(function(){
+    if(pts.length===1) mapa.setView(pts[0],8); else mapa.fitBounds(pts,{padding:[40,40],maxZoom:8});
+    if(MARC[ls[0]]) MARC[ls[0]].openPopup();
+  },400);
+}
+
+/* ===== RODA DA FAMÍLIA (gráfico em leque) ===== */
+// anel 1..4: uma pessoa por pedaço; anel 5: o casal de pais de cada pessoa do anel 4.
+// null = ainda não sabemos quem é
+var ANEIS = [
+ ["silvano","celiane"],
+ ["valmor","irani","hilario","juracy"],
+ ["manoel","almecinda","joseign","guiomar","manoelxavier","candida","miguel","julieta"],
+ ["aristides","valentinaines",null,null,"antonio","joaquina","justino","balduina",null,null,null,null,null,null,"manoeljose","virgulina"],
+ [null,null,null,null,null,null,"manoelcampos","marcolino",null,null,null,null,null,null,null,"eduardo"]
+];
+var CURTO = {silvano:"Silvano",celiane:"Celiane",valmor:"Valmor",irani:"Irani",hilario:"Hilário",juracy:"Juracy",
+ manoel:"Manoel Valentina",almecinda:"Maria Almecinda",joseign:"José Ignácio",guiomar:"Guiomar Campos",manoelxavier:"Manoel Xavier",candida:"Cândida Maria",miguel:"Miguel Mariano",julieta:"Julieta Ramalho",
+ aristides:"Aristides",valentinaines:"Valentina Inês",antonio:"Antônio Ignácio",joaquina:"Joaquina",justino:"Justino Campos",balduina:"Balduína",manoeljose:"Manoel José",virgulina:"Virgulina",
+ manoelcampos:"Manoel e Maria",marcolino:"Marcolino e Jesuíne",eduardo:"Eduardo e Casimira"};
+var RODA_IDS = {};
+var rodaEsc=1;
+function polar(r,a){ var t=a*Math.PI/180; return [r*Math.sin(t),-r*Math.cos(t)]; }
+function setor(r1,r2,a1,a2){
+  var g=(a2-a1)>180?1:0, p1=polar(r2,a1), p2=polar(r2,a2), p3=polar(r1,a2), p4=polar(r1,a1);
+  return "M"+p1+"A"+r2+","+r2+" 0 "+g+" 1 "+p2+"L"+p3+"A"+r1+","+r1+" 0 "+g+" 0 "+p4+"Z";
+}
+function quemDesconhecido(n,i){
+  // descobre de quem é pai/mãe o pedaço vazio
+  var filho=ANEIS[n-2]?ANEIS[n-2][Math.floor(i/2)]:null;
+  if(n===5){ filho=ANEIS[3][i]; return filho?"Pais de "+P[filho].n:"Antepassados (ainda não sabemos)"; }
+  if(!filho) return "Antepassado (ainda não sabemos)";
+  return (i%2===0?"Pai de ":"Mãe de ")+P[filho].n;
+}
+function desenharRoda(){
+  var R=[0,72,148,224,300,380,460], FS=[0,22,19,15,13,12];
+  var h='<svg viewBox="-470 -470 940 940" width="100%" style="max-width:'+Math.round(900*rodaEsc)+'px;min-width:'+Math.round(560*rodaEsc)+'px" role="img" aria-label="Roda da família">';
+  for(var n=1;n<=5;n++){
+    var lista=ANEIS[n-1], qtd=(n===5)?16:Math.pow(2,n), span=360/qtd;
+    for(var i=0;i<qtd;i++){
+      var id=lista[i], a1=180+i*span, a2=a1+span, mid=a1+span/2;
+      if(n>=5 && !ANEIS[3][i]) {/* sem filho conhecido: pedaço vazio claro */}
+      var cor,borda,txt,acao;
+      if(id){ var p=P[id]; cor=p.s==="c"?"#4caf50":"#ffb04a"; txt=CURTO[id]||p.n; acao="abrir('"+id+"')"; RODA_IDS[id]=1; }
+      else { cor=(n>=4 && n===4 ? (ANEIS[2][Math.floor(i/2)]?"#d9d9d9":"#efefef") : (ANEIS[3][i]?"#d9d9d9":"#efefef")); txt="?"; acao="abrirDesconhecido('"+quemDesconhecido(n,i).replace(/'/g,"\\'")+"')"; }
+      h+='<path d="'+setor(R[n],R[n+1]-2,a1,a2)+'" fill="'+cor+'" '+(id?'data-id="'+id+'"':'')+' tabindex="0" onclick="'+acao+'" onkeydown="if(event.key===\'Enter\')'+acao.replace(/"/g,'&quot;')+'"><title>'+(id?P[id].n:quemDesconhecido(n,i))+'</title></path>';
+      // texto
+      var rm=(R[n]+R[n+1])/2, pt=polar(rm,mid), rot, fs=FS[n];
+      var m=((mid%360)+360)%360;
+      if(n<=3){ rot=m; if(m>90&&m<270) rot+=180; }
+      else { rot=m-90; if(m>180) rot+=180; }
+      var linhas=[txt];
+      if(txt.indexOf(" e ")>0) linhas=[txt.split(" e ")[0]+" e",txt.split(" e ")[1]];
+      else if(txt.indexOf(" ")>0) linhas=[txt.slice(0,txt.indexOf(" ")),txt.slice(txt.indexOf(" ")+1)];
+      if(txt==="?") { linhas=["?"]; fs=FS[n]+6; }
+      h+='<text transform="translate('+pt[0].toFixed(1)+','+pt[1].toFixed(1)+') rotate('+rot.toFixed(1)+')" text-anchor="middle" font-size="'+fs+'" font-weight="bold" fill="#1b1b1b">';
+      linhas.forEach(function(l,k){ h+='<tspan x="0" dy="'+(k===0?(-(linhas.length-1)*fs*0.55+fs*0.35):fs*1.1)+'">'+l+'</tspan>'; });
+      h+='</text>';
+    }
+  }
+  // centro
+  h+='<circle r="70" fill="#2d2a26" style="cursor:pointer" onclick="abrir(\'irmaos\')"><title>Os netos</title></circle>';
+  h+='<text text-anchor="middle" fill="#fff" font-size="14" font-weight="bold" style="pointer-events:none"><tspan x="0" dy="-14">Alef, Alyson,</tspan><tspan x="0" dy="18">Álex e Adrian</tspan><tspan x="0" dy="20" font-size="11" font-weight="normal">(os netos)</tspan></text>';
+  // rótulos dos lados
+  h+='<text x="-460" y="-440" font-size="18" font-weight="bold" fill="#1f5fbf">◀ Família do pai</text>';
+  h+='<text x="460" y="-440" text-anchor="end" font-size="18" font-weight="bold" fill="#8a5a2b">Família da mãe ▶</text>';
+  h+='<line x1="0" y1="-462" x2="0" y2="462" stroke="#2d2a26" stroke-width="3" stroke-dasharray="6 6" style="pointer-events:none"/>';
+  h+='</svg>';
+  document.getElementById("roda").innerHTML=h;
+}
+function zoomRoda(d){ rodaEsc=Math.max(.6,Math.min(2.4,rodaEsc+d*.3)); desenharRoda(); }
+function abrirHist(i){
+  var h=HIST[i]; atual={tipo:"historia",rot:h.t};
+  document.getElementById("pNome").textContent=h.t;
+  document.getElementById("pSt").innerHTML='<span class="chip ask">? Ainda sem prova</span>';
+  document.getElementById("pSabe").innerHTML="<li>"+h.x+"</li>";
+  document.getElementById("pFalta").innerHTML="<li>Qualquer detalhe: nomes, cidades, quem contou.</li>";
+  var q=document.getElementById("pPerg"); q.style.display="block"; q.innerHTML="<b>Pergunta:</b> "+h.q;
+  document.getElementById("pLinks").innerHTML="";
+  document.getElementById("rNome").value=S.nome||"";
+  document.getElementById("rTexto").value="";
+  document.getElementById("dlgPessoa").showModal();
+}
+function abrirNovo(){ document.getElementById("nNome").value=S.nome||""; document.getElementById("dlgNovo").showModal(); }
+function fechar(id){ document.getElementById(id).close(); }
+
+function guardarPessoa(e){
+  e.preventDefault();
+  var txt=document.getElementById("rTexto").value.trim();
+  var tipo=document.querySelector('input[name=rTipo]:checked').value;
+  var nome=document.getElementById("rNome").value.trim();
+  if(!nome){ alert("Por favor, escreva o seu nome."); document.getElementById("rNome").focus(); return false; }
+  if(tipo!=="CONFIRMO" && !txt){ alert("Escreva um pouquinho sobre o que você sabe."); document.getElementById("rTexto").focus(); return false; }
+  S.nome=nome;
+  S.respostas.push({quem:nome,sobre:atual.rot,tipo:tipo,texto:txt});
+  salvar(); lista(); fechar("dlgPessoa");
+  alert("Pronto! Sua resposta foi guardada. Quando terminar, toque em “Enviar pelo WhatsApp”.");
+  return false;
+}
+function guardarNovo(e){
+  e.preventDefault();
+  var n={quem:document.getElementById("nNome").value.trim(),pessoa:document.getElementById("nPessoa").value.trim(),
+    rel:document.getElementById("nRel").value,de:document.getElementById("nDe").value.trim(),
+    onde:document.getElementById("nOnde").value.trim(),mais:document.getElementById("nQuem").value.trim()};
+  if(!n.quem||!n.pessoa){ alert("Escreva o seu nome e o nome da pessoa."); return false; }
+  S.nome=n.quem; S.novos.push(n); salvar(); lista(); fechar("dlgNovo");
+  ["nPessoa","nDe","nOnde","nQuem"].forEach(function(i){document.getElementById(i).value="";});
+  alert("Pronto! O parente foi guardado.");
+  return false;
+}
+
+/* ===== RESPOSTAS ===== */
+function texto(){
+  var t="🌳 Árvore da família: respostas"+(S.nome?" de "+S.nome:"")+"\n";
+  S.respostas.forEach(function(r,i){
+    var ic=r.tipo==="CONFIRMO"?"✔ Confirmo":(r.tipo==="CORRIJO"?"✏️ Corrijo":"➕ Acrescento");
+    t+="\n"+(i+1)+") "+r.sobre+" — "+ic+(r.texto?": "+r.texto:"")+(r.quem!==S.nome?" ("+r.quem+")":"");
+  });
+  S.novos.forEach(function(n){
+    t+="\n➕ NOVO PARENTE: "+n.pessoa+" ("+n.rel+(n.de?", parente: "+n.de:"")+")"+(n.onde?". Onde/quando: "+n.onde:"")+(n.mais?". Quem sabe mais: "+n.mais:"");
+  });
+  var tem=TAREFAS.filter(function(_,i){return S.feito[i];}).map(function(x){return x[0];});
+  if(tem.length) t+="\n\n📄 Já tenho em casa:\n- "+tem.join("\n- ");
+  return t;
+}
+function lista(){
+  var n=S.respostas.length+S.novos.length;
+  document.getElementById("cont").textContent=n?("Você tem "+n+(n===1?" resposta":" respostas")):"Nenhuma resposta ainda";
+  var h="";
+  if(!n) h='<p class="small">Quando você responder, as respostas aparecem aqui. Depois toque em “Enviar pelo WhatsApp”. Elas ficam guardadas neste aparelho, e ninguém vê antes de você enviar.</p>';
+  S.respostas.forEach(function(r,i){ h+='<div class="mine"><b>'+r.sobre+'</b> — '+r.tipo.toLowerCase()+(r.texto?': '+esc(r.texto):'')+' <button onclick="apagar(\'r\','+i+')">Apagar</button></div>'; });
+  S.novos.forEach(function(x,i){ h+='<div class="mine"><b>Novo parente:</b> '+esc(x.pessoa)+' ('+esc(x.rel)+') <button onclick="apagar(\'n\','+i+')">Apagar</button></div>'; });
+  document.getElementById("minhas").innerHTML=h;
+}
+function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+function apagar(k,i){ if(!confirm("Apagar esta resposta?"))return; (k==="r"?S.respostas:S.novos).splice(i,1); salvar(); lista(); }
+function enviarZap(){
+  if(!S.respostas.length && !S.novos.length && !Object.keys(S.feito).some(function(k){return S.feito[k];})){ alert("Você ainda não respondeu nada. Toque em um quadradinho e conte o que sabe."); return; }
+  window.open("https://wa.me/"+ZAP+"?text="+encodeURIComponent(texto()),"_blank");
+}
+function copiar(){
+  var t=texto();
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(function(){alert("Copiado! Agora é só colar no WhatsApp.");},function(){prompt("Copie o texto abaixo:",t);}); }
+  else prompt("Copie o texto abaixo:",t);
+}
+/* ===== MAPA ===== */
+// [nome, lat, lon, ramo, c(documento)|p(relato), o que aconteceu, prova]
+var LUG = [
+ ["Imaruí e Cangueri (SC)",-28.33,-48.82,"valentina","c","Aristides (de Cangueri), Manoel Valentina e Maria Almecinda moraram aqui. Valmor nasceu aqui (1951). Manoel morreu aqui em 1995 e foi sepultado em Cangueri.","Óbito de Manoel (1995) e edital de casamento de Valmor (1971)"],
+ ["Florianópolis (SC), bairro do Estreito",-27.59,-48.58,"valentina","c","Valmor e Irani publicaram o edital de casamento em junho de 1971.","Diário da Justiça de SC, 22/06/1971"],
+ ["Joinville (SC)",-26.30,-48.85,"valentina","c","Silvano nasceu aqui (1975).","RG do Silvano e certidão do Alef"],
+ ["Brejo Santo (CE), antigo Brejo dos Santos",-7.49,-38.99,"santos","c","José Ignácio dos Santos nasceu aqui em 1913. Seus pais Antônio e Joaquina eram daqui.","Certidão de casamento de 1937"],
+ ["Crato (CE)",-7.23,-39.41,"santos","p","O caderno da vó Irani e uma árvore pública dizem que José nasceu no Crato.","Relato e árvore da internet (não confere com a certidão)"],
+ ["Caetité (BA)",-14.07,-42.48,"santos","c","Guiomar Campos nasceu aqui em 1918.","Certidão de casamento de 1937"],
+ ["Brumado (BA), antigo Bom Jesus das Minas / dos Meiras",-14.20,-41.66,"santos","c","Justino Campos Bahia (1872) e Balduína (1897) eram daqui.","Casamento de 1937 e registros do FamilySearch"],
+ ["Rio São Francisco (lugar exato desconhecido)",-13.25,-43.42,"santos","p","Conta-se que o bisavô Manoel Marcolino morreu atravessando o rio com uma tropa.","Caderno da vó Irani"],
+ ["Quintana, Glicério (SP)",-21.38,-50.21,"santos","c","José Ignácio e Guiomar se casaram aqui em 14/08/1937.","Certidão de casamento nº 347"],
+ ["Parnaso, Tupã (SP)",-21.97,-50.62,"santos","c","Irani nasceu aqui (1944). Três irmãos dela morreram bebês aqui (1939, 1940 e 1946).","Registros de óbito no FamilySearch"],
+ ["Bonito de Santa Fé (PB)",-7.31,-38.51,"ramalho","c","Julieta Ramalho de Sousa nasceu aqui em 10/01/1905.","Óbito de Julieta (1977)"],
+ ["Conceição (PB)",-7.56,-38.51,"ramalho","p","Manoel José de Souza e Virgulina Ramalho teriam se casado aqui (1907). É também a cidade natal da Elba Ramalho.","Árvore pública na internet (a confirmar)"],
+ ["Ibiara (PB)",-7.50,-38.41,"ramalho","p","Terra do ramo “Pinto Ramalho”, segundo livro de história de 1985.","Livro “Conceição do Piancó de Ontem e de Hoje” (a ler)"],
+ ["Itaporanga (PB)",-7.30,-38.15,"ramalho","c","Hilário e Juracy se casaram aqui em 26/01/1969.","Registro de casamento (livro B-37)"],
+ ["Diamante (PB), Sítio Sabonete",-7.42,-38.26,"ramalho","c","Celiane nasceu no Sítio Sabonete em 30/08/1974. A família de Hilário e Juracy morava na região.","Certidão de nascimento da Celiane"],
+ ["Boa Ventura (PB)",-7.42,-38.21,"ramalho","c","Julieta morreu aqui em 1977. A certidão da Celiane foi registrada aqui em 1976.","Óbito de Julieta e certidão da Celiane"],
+ ["Diadema (SP)",-23.69,-46.62,"ramalho","p","A família de Hilário e Juracy teria morado aqui por volta de 1978.","Documento citado na pesquisa, ainda não visto"],
+ ["Ariquemes (RO)",-9.91,-63.04,"todos","c","Alef nasceu aqui em 1994. O vô Hilário aparece morando na comarca.","Certidão do Alef; Diário da Justiça de RO"],
+ ["Alto Paraíso (RO)",-9.71,-63.32,"todos","c","Silvano e Celiane se casaram aqui. Os netos foram registrados aqui. A bisavó Guiomar morreu aqui em 2008, e o caderno diz que José e Guiomar estão sepultados aqui.","Certidões, RGs e óbito de Guiomar"]
+];
+// caminhos de cada ramo (índices de LUG, em ordem de tempo)
+var CAM = {valentina:[0,1,2,18], santos:[6,5,3,8,9,1,18], ramalho:[10,11,13,14,15,16,17,18]};
+var COR = {valentina:"#1f5fbf", santos:"#7a3fa8", ramalho:"#8a5a2b", todos:"#2d2a26"};
+// pessoa -> lugares (índices de LUG)
+var LP = {aristides:[0],valentinaines:[0],manoel:[0],almecinda:[0],valmor:[0,1],irmaosvalmor:[0],irani:[9,1,18],silvano:[2,18],
+ antonio:[3],joaquina:[3],joseign:[3,4,8,9,18],guiomar:[5,8,9,18],justino:[6,5],balduina:[6],manoelcampos:[6],marcolino:[7],irmaosirani:[9],
+ julieta:[10,15],manoeljose:[11],virgulina:[11],eduardo:[12],hilario:[13,14,17],juracy:[13,14,16],miguel:[15],irmaosjuracy:[15],
+ celiane:[14,15,18],alef:[17],irmaos:[18],filhoshilario:[14,16,18]};
+var mapa=null, camadas={}, MARC={};
+function iniciarMapa(){
+  document.getElementById("listaLugares").innerHTML=LUG.map(function(l){
+    return '<div class="mine" style="border-left:8px solid '+(l[4]==="c"?"var(--ok)":"var(--ask)")+'"><b>'+l[0]+'</b> — '+(l[4]==="c"?"✔ com documento":"? relato, a confirmar")+'<br>'+l[5]+'<br><span class="small">Prova: '+l[6]+'</span></div>';
+  }).join("");
+  if(typeof L==="undefined"){ document.getElementById("mapa").style.display="none"; document.getElementById("mapaAviso").style.display="block"; return; }
+  mapa=L.map("mapa",{scrollWheelZoom:false}).setView([-15.5,-48],4);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap"}).addTo(mapa);
+  ["valentina","santos","ramalho","todos"].forEach(function(r){ camadas[r]=L.layerGroup().addTo(mapa); });
+  Object.keys(CAM).forEach(function(r){
+    L.polyline(CAM[r].map(function(i){return [LUG[i][1],LUG[i][2]];}),{color:COR[r],weight:4,opacity:.75,dashArray:"8 8"}).addTo(camadas[r]);
+  });
+  LUG.forEach(function(l,idx){
+    var ok=l[4]==="c";
+    var pess=Object.keys(LP).filter(function(k){return LP[k].indexOf(idx)>=0;});
+    var bts=pess.map(function(k){return '<button style="font-size:14px;min-height:2.2rem;padding:.2rem .5rem;margin:.15rem" onclick="abrir(\''+k+'\')">'+(CURTO[k]||P[k].n)+'</button>';}).join("");
+    MARC[idx]=L.circleMarker([l[1],l[2]],{radius:11,color:ok?"#14663a":"#a04a00",weight:4,fillColor:ok?"#4caf50":"#ff9f1a",fillOpacity:.9,dashArray:ok?null:"4 3"})
+     .bindPopup('<div style="font-size:16px;line-height:1.4"><b>'+l[0]+'</b><br><span style="color:'+(ok?"#14663a":"#a04a00")+';font-weight:bold">'+(ok?"✔ Com documento":"? Relato, a confirmar")+'</span><br>'+l[5]+'<br><i>Prova: '+l[6]+'</i>'+(bts?'<br><b>Quem é daqui (toque):</b><br>'+bts:'')+'</div>',{maxWidth:300})
+     .addTo(camadas[l[3]]);
+  });
+}
+function verRamo(r){
+  if(!mapa) return;
+  Object.keys(camadas).forEach(function(k){ if(r==="todos"||k===r||k==="todos") mapa.addLayer(camadas[k]); else mapa.removeLayer(camadas[k]); });
+  var pts=LUG.filter(function(l){return r==="todos"||l[3]===r||l[3]==="todos";}).map(function(l){return [l[1],l[2]];});
+  mapa.fitBounds(pts,{padding:[30,30]});
+  document.querySelectorAll("#filtros button").forEach(function(b){b.classList.remove("main");});
+  event&&event.target&&event.target.classList.add("main");
+}
+
+var fs=20;
+function zoom(d){ fs=Math.max(16,Math.min(30,fs+d)); document.documentElement.style.setProperty("--fs",fs+"px"); }
+montar();
+desenharRoda();
+try{ iniciarMapa(); }catch(e){ document.getElementById("mapa").style.display="none"; document.getElementById("mapaAviso").style.display="block"; }
+</script>
+</body>
+</html>

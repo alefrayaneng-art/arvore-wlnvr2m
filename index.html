@@ -11,6 +11,7 @@
 <title>A história da nossa família</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <style>
 :root{
   --ok:#14663a; --ok-bg:#e1f4e7;
@@ -79,6 +80,15 @@ textarea{min-height:7rem}
 .flash{animation:flash 1s ease-in-out 3;outline:6px solid #ffb300!important;outline-offset:3px}
 @keyframes flash{50%{outline-color:#ff3d00}}
 #roda svg{display:block;margin:0 auto}
+#grafo svg{width:100%;height:100%;cursor:grab;font-family:Verdana,Tahoma,Arial,sans-serif}
+#grafo .lnk{fill:none;stroke:#8a7f6c;stroke-width:2.5}
+#grafo .no rect{stroke-width:3;rx:10;ry:10}
+#grafo .no .nome{font-size:14px;font-weight:bold;fill:#1b1b1b}
+#grafo .no .sub{font-size:11.5px;fill:#333}
+#grafo .tg circle{stroke:#2d2a26;stroke-width:2.5;fill:#fff;cursor:pointer}
+#grafo .tg text{font-size:18px;font-weight:bold;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+#grafo .corpo{cursor:pointer}
+#grafo .hl rect{stroke:#ff3d00!important;stroke-width:7!important}
 #roda path{cursor:pointer;stroke:#fff;stroke-width:2}
 #roda path:hover,#roda path:focus{opacity:.8}
 #roda path.hl{stroke:#ffb300;stroke-width:8;animation:hl 1s ease-in-out 4}
@@ -92,26 +102,51 @@ textarea{min-height:7rem}
   body{padding-bottom:8rem}
   .p{width:100%}
 }
-@media print{.legend,.bar,.tools,button{display:none!important}body{padding:0}}
+.aba{display:none}
+.aba.ativa{display:block}
+body{padding-bottom:6rem}
+.navbar{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;background:#2d2a26;border-top:3px solid #d4a800;padding:.25rem .2rem calc(.25rem + env(safe-area-inset-bottom))}
+.navbar button{flex:1;min-width:0;background:none;border:0;border-radius:.6rem;color:#f3ede2;font-size:.72rem;padding:.3rem .1rem;min-height:3.6rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.1rem;position:relative;line-height:1.1}
+.navbar button span{font-size:1.45rem;line-height:1}
+.navbar button[aria-current="page"]{background:#d4a800;color:#1b1b1b;font-weight:bold}
+.badge{position:absolute;top:.15rem;right:18%;background:#d62828;color:#fff;border-radius:1rem;font-size:.7rem;padding:0 .35rem;min-width:1.2rem}
+.atalhos{display:grid;grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr));gap:.6rem;margin:.8rem 0}
+.atalhos button{display:flex;flex-direction:column;align-items:center;gap:.2rem;padding:.8rem .5rem;background:#fff;border:3px solid #2d2a26;font-weight:bold;font-size:1rem}
+.atalhos button span{font-size:2.2rem}
+.atalhos small{font-weight:normal;font-size:.78rem;color:#444;text-align:center}
+.envio{background:#fff;border:3px solid #0b4f8a;border-radius:.8rem;padding:.7rem 1rem;margin:.8rem 0}
+@media (min-width:900px){.navbar button{font-size:.85rem}}
+@media (max-width:640px){
+  main h2{font-size:1.05rem;margin-top:.8rem}
+  .aba[data-aba="arvore"] > p.small{font-size:.78rem;margin:.3rem 0}
+  #grafoBotoes{gap:.3rem;margin:.3rem 0}
+  #grafoBotoes button{min-height:2.3rem;padding:.25rem .55rem;font-size:.8rem}
+  #grafo{height:62vh!important;min-height:20rem!important}
+  .navbar button{font-size:.62rem}
+  .navbar button span{font-size:1.3rem}
+}
+@media print{.legend,.bar,.navbar,.tools,button{display:none!important}body{padding:0}.aba{display:block!important}}
 </style>
 </head>
 <body>
+<section class="aba" data-aba="inicio">
 <header>
   <h1>🌳 A história da nossa família</h1>
   <div class="intro">
-    <p style="margin:.2rem 0"><b>Olá!</b> Estamos montando a árvore da nossa família e precisamos da ajuda de vocês. Cada pessoa tem um quadradinho. <b>Toque no quadradinho</b> para ver o que já sabemos e para nos contar o que você sabe.</p>
+    <p style="margin:.2rem 0"><b>Olá!</b> Estamos montando a árvore da nossa família e precisamos da ajuda de vocês. <b>Use os botões da barra lá embaixo</b> para ver a família de jeitos diferentes. Toque no nome de qualquer pessoa para ver o que já sabemos e contar o que você sabe.</p>
     <p style="margin:.2rem 0"><b>Não precisa saber tudo.</b> Um nome, uma data, uma cidade ou uma lembrança já ajudam muito.</p>
+    <div class="atalhos">
+      <button onclick="mostrarAba('arvore')"><span>🌳</span>Árvore<small>quem é quem, abre e fecha</small></button>
+      <button onclick="mostrarAba('roda')"><span>⭕</span>Roda<small>todos os antepassados num círculo</small></button>
+      <button onclick="mostrarAba('mapa')"><span>🗺️</span>Mapa<small>as cidades da família</small></button>
+      <button onclick="mostrarAba('historias')"><span>📖</span>Histórias<small>o que se conta</small></button>
+      <button onclick="mostrarAba('tarefas')"><span>✅</span>Ajudar<small>documentos que faltam</small></button>
+      <button onclick="mostrarAba('responder')"><span>💬</span>Responder<small>mandar pelo WhatsApp</small></button>
+    </div>
     <div class="tools">
       <button onclick="zoom(2)" aria-label="Aumentar a letra">🔍 Letra maior</button>
       <button onclick="zoom(-2)" aria-label="Diminuir a letra">Letra menor</button>
-      <button onclick="abrirNovo()" class="main">➕ Contar de um parente que não está aqui</button>
       <button onclick="window.print()">🖨️ Imprimir</button>
-    </div>
-    <p style="margin:.4rem 0 .2rem"><b>Três jeitos de ver a família</b> (toque para ir):</p>
-    <div class="tools">
-      <button onclick="ir('g-nucleo')">🌳 Árvore</button>
-      <button onclick="ir('roda')">⭕ Roda da família</button>
-      <button onclick="ir('mapa')">🗺️ Mapa das cidades</button>
     </div>
   </div>
 </header>
@@ -122,22 +157,39 @@ textarea{min-height:7rem}
   <span class="chip ok">✔ VERDE = já temos documento (certidão, registro)</span>
   <span class="chip ask">? LARANJA = ainda é o que a família conta. Falta confirmar</span>
 </div></div>
+</section>
 
 <main>
 
-<h2>1. Nossa família hoje</h2>
+<section class="aba" data-aba="arvore">
+<h2 id="arvoreTopo">🌳 Árvore da família</h2>
+<p class="small"><b>＋</b> abre um ramo, <b>－</b> fecha. Toque no <b>nome</b> para ver detalhes. Arraste para andar; use dois dedos ou os botões para aproximar.</p>
+<div class="tools" id="grafoBotoes">
+  <button onclick="grafoZoom(1.3)" aria-label="Aproximar">🔍＋</button>
+  <button onclick="grafoZoom(1/1.3)" aria-label="Afastar">🔍－</button>
+  <button onclick="grafoAbrirTudo()">Abrir tudo</button>
+  <button onclick="grafoCentralizar()">↺ Recolher e voltar</button>
+</div>
+<div id="grafo" style="height:75vh;min-height:24rem;border:3px solid #2d2a26;border-radius:.8rem;background:#fffdf8;overflow:hidden;touch-action:none"></div>
+<div class="legend" style="position:static;border:0;background:none;padding:.4rem 0"><div>
+  <span class="chip ok">✔ com documento</span><span class="chip ask">? falta confirmar</span><span class="chip" style="background:#eee;border:3px dotted #888;color:#555">? ainda não sabemos quem é</span><span class="chip" style="background:#e8eef7;border:3px solid #6b86ad;color:#2c4a73">📁 grupo de irmãos ou primos</span>
+</div></div>
+<p class="small" id="grafoAviso" style="display:none">A árvore interativa precisa de internet para aparecer. Enquanto isso, use a lista abaixo.</p>
+
+<details id="listaArvore" style="margin:.8rem 0"><summary style="font-weight:bold;cursor:pointer;padding:.6rem;background:#efe9dc;border-radius:.6rem">📋 Ver a árvore em lista (todos os quadradinhos, por ramo)</summary>
+<h2>Nossa família hoje</h2>
 <div id="g-nucleo"></div>
-
-<h2>2. Lado do pai (Silvano): família Valentina, de Santa Catarina</h2>
+<h2>Lado do pai (Silvano): família Valentina, de Santa Catarina</h2>
 <div id="g-valentina"></div>
-
-<h2>3. Lado do pai (Silvano): família Santos e Campos, do Ceará, da Bahia e de São Paulo</h2>
+<h2>Lado do pai (Silvano): família Santos e Campos, do Ceará, da Bahia e de São Paulo</h2>
 <div id="g-santos"></div>
-
-<h2>4. Lado da mãe (Celiane): família Ramalho e Xavier, da Paraíba</h2>
+<h2>Lado da mãe (Celiane): família Ramalho e Xavier, da Paraíba</h2>
 <div id="g-ramalho"></div>
+</details>
+</section>
 
-<h2>5. Roda da família</h2>
+<section class="aba" data-aba="roda">
+<h2>⭕ Roda da família</h2>
 <p class="small">Os netos estão no <b>centro</b>. Cada anel para fora é uma geração mais antiga: pais, avós, bisavós, trisavós. O lado <b>esquerdo</b> é a família do pai (Silvano) e o <b>direito</b>, a da mãe (Celiane). <b>Toque em um pedaço</b> para ver a pessoa. Os pedaços <b>cinza com “?”</b> são pessoas que ainda não sabemos quem são: toque e conte, se souber!</p>
 <div class="tools">
   <button onclick="zoomRoda(1)">🔍 Ampliar a roda</button>
@@ -148,7 +200,10 @@ textarea{min-height:7rem}
   <span class="chip ok">✔ com documento</span><span class="chip ask">? falta confirmar</span><span class="chip" style="background:#eee;border:3px dotted #888;color:#555">? ainda não sabemos quem é</span>
 </div></div>
 
-<h2>6. Mapa: por onde a nossa família passou</h2>
+</section>
+
+<section class="aba" data-aba="mapa">
+<h2>🗺️ Mapa: por onde a nossa família passou</h2>
 <p class="small">Cada alfinete é uma cidade que aparece nos documentos ou nas histórias. <b>Toque no alfinete</b> para ver o que aconteceu ali e qual é a prova. As linhas mostram o caminho de cada ramo da família ao longo dos anos.</p>
 <div class="tools" id="filtros">
   <button onclick="verRamo('todos')" class="main">Todos</button>
@@ -160,23 +215,49 @@ textarea{min-height:7rem}
 <p class="small" id="mapaAviso" style="display:none">O mapa precisa de internet para aparecer. Enquanto isso, veja a lista de lugares abaixo.</p>
 <details style="margin:.6rem 0"><summary style="font-weight:bold;cursor:pointer;padding:.5rem 0">📋 Ver a lista de lugares (sem mapa)</summary><div id="listaLugares"></div></details>
 
-<h2>7. Histórias que a família conta (ainda sem prova)</h2>
+</section>
+
+<section class="aba" data-aba="historias">
+<h2>📖 Histórias que a família conta</h2>
 <p class="small">Estas histórias são bonitas, mas ainda <b>não têm documento</b>. Elas ficam em laranja até a gente achar a prova. Se você ouviu alguma delas, conte para nós de quem ouviu.</p>
 <div id="historias"></div>
 
-<h2>8. O que podemos conseguir juntos</h2>
+</section>
+
+<section class="aba" data-aba="tarefas">
+<h2>✅ O que podemos conseguir juntos</h2>
 <p class="small">Marque ✔ o que você <b>já tem em casa</b>. Pode mandar uma foto pelo WhatsApp. Foto de certidão, de RG ou de foto antiga com nome escrito atrás também serve.</p>
 <div id="tarefas"></div>
 
-<h2>9. Suas respostas</h2>
+</section>
+
+<section class="aba" data-aba="responder">
+<h2>💬 Responder e mandar para o Alef</h2>
+<p class="small">Para responder sobre uma pessoa, abra a <b>Árvore</b> ou a <b>Roda</b> e toque no nome dela. Para falar de alguém que não aparece, use o botão abaixo. Quando terminar, toque em <b>Enviar pelo WhatsApp</b>.</p>
+<div class="tools">
+  <button onclick="abrirNovo()" class="main">➕ Contar de um parente que não está aqui</button>
+</div>
+<div class="envio">
+  <p id="cont" style="font-weight:bold;margin:.2rem 0 .5rem">Nenhuma resposta ainda</p>
+  <div class="tools">
+    <button class="main" onclick="enviarZap()">📲 Enviar pelo WhatsApp</button>
+    <button onclick="copiar()">📋 Copiar o texto</button>
+  </div>
+</div>
+<h3 style="margin-top:1rem">Suas respostas guardadas</h3>
 <div id="minhas"></div>
+</section>
 </main>
 
-<div class="bar">
-  <span id="cont">Nenhuma resposta ainda</span>
-  <button class="main" onclick="enviarZap()">📲 Enviar pelo WhatsApp</button>
-  <button onclick="copiar()">📋 Copiar</button>
-</div>
+<nav class="navbar" aria-label="Seções">
+  <button data-ir="inicio"><span>🏠</span>Início</button>
+  <button data-ir="arvore"><span>🌳</span>Árvore</button>
+  <button data-ir="roda"><span>⭕</span>Roda</button>
+  <button data-ir="mapa"><span>🗺️</span>Mapa</button>
+  <button data-ir="historias"><span>📖</span>Histórias</button>
+  <button data-ir="tarefas"><span>✅</span>Ajudar</button>
+  <button data-ir="responder"><span>💬</span>Responder<b id="badge" class="badge" hidden>0</b></button>
+</nav>
 
 <!-- Janela da pessoa -->
 <dialog id="dlgPessoa">
@@ -499,9 +580,27 @@ function abrirDesconhecido(rot){
   document.getElementById("dlgPessoa").showModal();
 }
 /* ===== LIGAÇÕES ENTRE AS VISTAS ===== */
-function ir(id){ var e=document.getElementById(id); if(e) e.scrollIntoView({behavior:"smooth",block:"start"}); }
+var ABA_JA={};
+function mostrarAba(n){
+  var secs=document.querySelectorAll(".aba"), achou=false;
+  secs.forEach(function(s){ var on=s.getAttribute("data-aba")===n; s.classList.toggle("ativa",on); if(on) achou=true; });
+  if(!achou){ n="inicio"; document.querySelector('.aba[data-aba="inicio"]').classList.add("ativa"); }
+  document.querySelectorAll(".navbar button").forEach(function(b){ if(b.getAttribute("data-ir")===n) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current"); });
+  try{ localStorage.setItem("arvoreValentina_aba",n); }catch(e){}
+  if(location.hash!=="#"+n){ try{ history.replaceState(null,"","#"+n); }catch(e){} }
+  window.scrollTo(0,0);
+  if(n==="arvore" && !ABA_JA.arvore && window.grafoCentralizar){ ABA_JA.arvore=1; setTimeout(window.grafoCentralizar,60); }
+  if(n==="mapa" && typeof mapa!=="undefined" && mapa){ setTimeout(function(){ mapa.invalidateSize(); if(!ABA_JA.mapa){ ABA_JA.mapa=1; verRamo("todos"); } },80); }
+}
+function ir(id){
+  var e=document.getElementById(id); if(!e) return;
+  var s=e.closest(".aba"); if(s && !s.classList.contains("ativa")) mostrarAba(s.getAttribute("data-aba"));
+  setTimeout(function(){ e.scrollIntoView({behavior:"smooth",block:"start"}); },90);
+}
 function verNaArvore(id){
   fechar("dlgPessoa");
+  if(window.grafoFocar && grafoFocar(id)) return;
+  document.getElementById("listaArvore").open=true;
   var b=document.querySelector('.p[data-id="'+id+'"]'); if(!b) return;
   b.scrollIntoView({behavior:"smooth",block:"center"});
   b.classList.remove("flash"); void b.offsetWidth; b.classList.add("flash");
@@ -649,7 +748,8 @@ function texto(){
 }
 function lista(){
   var n=S.respostas.length+S.novos.length;
-  document.getElementById("cont").textContent=n?("Você tem "+n+(n===1?" resposta":" respostas")):"Nenhuma resposta ainda";
+  document.getElementById("cont").textContent=n?("Você tem "+n+(n===1?" resposta guardada. Toque em Enviar quando terminar.":" respostas guardadas. Toque em Enviar quando terminar.")):"Nenhuma resposta ainda";
+  var bg=document.getElementById("badge"); if(bg){ bg.textContent=n; bg.hidden=!n; }
   var h="";
   if(!n) h='<p class="small">Quando você responder, as respostas aparecem aqui. Depois toque em “Enviar pelo WhatsApp”. Elas ficam guardadas neste aparelho, e ninguém vê antes de você enviar.</p>';
   S.respostas.forEach(function(r,i){ h+='<div class="mine"><b>'+r.sobre+'</b> — '+r.tipo.toLowerCase()+(r.texto?': '+esc(r.texto):'')+' <button onclick="apagar(\'r\','+i+')">Apagar</button></div>'; });
@@ -909,9 +1009,139 @@ var FSNOTA = {
   TAREFAS.push(["Certidão de óbito da bisavó Cândida e do bisavô Manoel Xavier","Mostram os pais deles e abrem mais uma geração."]);
 })();
 
+/* ===== ÁRVORE INTERATIVA EXPANSÍVEL (D3) ===== */
+function PS(id,kids){ return {id:id,children:kids||[]}; }
+function GR(t,ids){ return {grupo:t,children:ids.map(function(k){return {id:k,children:[]};})}; }
+function UNK(t){ return {unk:t,children:[]}; }
+var GRAFO=null;
+function montarTree(){
+  return {id:"irmaos",children:[
+    GR("Os quatro netos",["alef","alyson","alex","adrian"]),
+    PS("silvano",[
+      PS("valmor",[
+        PS("manoel",[
+          PS("aristides",[PS("domingosrosa")]),
+          PS("valentinaines",[UNK("Pais de Valentina Inês da Conceição")]),
+          GR("Possíveis parentes do Manoel (pistas)",["gessi","miguelmv"])
+        ]),
+        PS("almecinda",[PS("marcolinooliv")]),
+        GR("Irmãos do vô Valmor (10)",["v_jose","v_lorival","v_lorena","v_madalena","v_helena","v_filomena","v_bernadete","v_antonio","v_guiomar","v_joaquim"])
+      ]),
+      PS("irani",[
+        PS("joseign",[PS("antonio",[UNK("Pais de Antônio Ignácio dos Santos")]),PS("joaquina",[UNK("Pais de Joaquina Maria da Conceição")])]),
+        PS("guiomar",[PS("justino",[PS("manoelcampos")]),PS("balduina",[PS("marcolino")])]),
+        GR("Irmãos da vó Irani (18 filhos)",["s_anania","s_amaniar","s_francina","s_jaci","s_irandir","s_orandi","s_ananias","s_natanael","s_paulo","s_debora","s_jose","s_guiomar","s_dagmar","s_justino","s_silas","s_samuel","s_iracema","s_julia","s_olimpia"])
+      ]),
+      GR("Irmãos do Silvano (tios)",["paulo","eliane","jackson","valmorbebe","vania"])
+    ]),
+    PS("celiane",[
+      PS("hilario",[
+        PS("manoelxavier",[PS("joaoxavier")]),
+        PS("candida",[UNK("Pais de Cândida Maria da Conceição")]),
+        GR("Irmãos do vô Hilário",["h_assis","h_naldo","h_diassis","h_laura"]),
+        GR("Primos (filhos dos irmãos do Hilário)",["nena","leonice"])
+      ]),
+      PS("juracy",[
+        PS("miguel",[PS("marianorod")]),
+        PS("julieta",[
+          PS("manoeljose",[PS("estendeslau")]),
+          PS("virgulina",[PS("eduardo",[PS("manoelalexandre",[UNK("Pais de Manoel Alexandre e de Victória")])])])
+        ]),
+        GR("Irmãos da vó Juracy",["j_expedito","j_josemariano","j_severino"])
+      ]),
+      GR("Irmãos da Celiane (tios)",["selma","lucilene","neide","celio","cicero"])
+    ])
+  ]};
+}
+function quebra(t,max){ var w=String(t).split(" "),l=[""],i; for(i=0;i<w.length;i++){ if((l[l.length-1]+" "+w[i]).trim().length>max && l[l.length-1]) l.push(w[i]); else l[l.length-1]=(l[l.length-1]+" "+w[i]).trim(); } if(l.length>2){ l=[l[0],(l.slice(1).join(" ")).slice(0,max-1)+"…"]; } return l; }
+function kids(d){ return d.children||d._children||null; }
+function desenharGrafo(){
+  if(typeof d3==="undefined"){ document.getElementById("grafo").style.display="none"; document.getElementById("grafoBotoes").style.display="none"; document.getElementById("grafoAviso").style.display="block"; document.getElementById("listaArvore").open=true; return; }
+  var W=230,H=60,DX=290,DY=76;
+  var box=document.getElementById("grafo");
+  var svg=d3.select(box).append("svg");
+  var g=svg.append("g");
+  var gl=g.append("g"), gn=g.append("g");
+  var zoom=d3.zoom().scaleExtent([0.25,2.5]).on("zoom",function(e){ g.attr("transform",e.transform); });
+  svg.call(zoom).on("dblclick.zoom",null);
+  var root=d3.hierarchy(montarTree());
+  root.descendants().forEach(function(d){ if(d.depth>=1 && (d.data.grupo || d.depth>=2) && d.children){ d._children=d.children; d.children=null; } });
+  var tree=d3.tree().nodeSize([DY,DX]).separation(function(a,b){ return a.parent===b.parent?1:1.15; });
+  function info(d){
+    var x=d.data;
+    if(x.grupo) return {t:x.grupo,s:"📁 "+(kids(d)||[]).length+" pessoas — toque para abrir",f:"#e8eef7",st:"#6b86ad",da:null};
+    if(x.unk) return {t:x.unk,s:"? Ainda não sabemos. Toque se souber!",f:"#eeeeee",st:"#888",da:"3 4"};
+    var p=P[x.id]||{n:x.id,s:"p"}; var ok=p.s==="c";
+    var nome=(x.id==="irmaos")?"Alef, Alyson, Álex e Adrian (netos)":p.n;
+    return {t:nome,s:(ok?"✔ com documento":"? falta confirmar")+(p.aj?"  🏅":""),f:ok?"#e1f4e7":"#fff0d6",st:ok?"#14663a":"#a04a00",da:ok?null:"7 4"};
+  }
+  function atualizar(foco){
+    tree(root);
+    var nodes=root.descendants(), links=root.links();
+    var L=gl.selectAll("path").data(links,function(d){return d.target.data._k||(d.target.data._k=Math.random());});
+    L.exit().remove();
+    L.enter().append("path").attr("class","lnk").merge(L)
+      .attr("d",function(d){ return "M"+(d.source.y+W)+","+d.source.x+"C"+(d.source.y+W+DX*0.35)+","+d.source.x+" "+(d.target.y-DX*0.3)+","+d.target.x+" "+d.target.y+","+d.target.x; });
+    var N=gn.selectAll("g.no").data(nodes,function(d){return d.data._k||(d.data._k=Math.random());});
+    N.exit().remove();
+    var E=N.enter().append("g").attr("class","no");
+    E.append("g").attr("class","corpo");
+    E.append("g").attr("class","tg");
+    var A=E.merge(N);
+    A.attr("transform",function(d){return "translate("+d.y+","+(d.x-H/2)+")";})
+     .attr("data-id",function(d){return d.data.id||"";});
+    A.select(".corpo").each(function(d){
+      var el=d3.select(this); el.selectAll("*").remove(); var k=info(d);
+      el.append("rect").attr("width",W).attr("height",H).attr("fill",k.f).attr("stroke",k.st).attr("stroke-dasharray",k.da);
+      var ls=quebra(k.t,27);
+      ls.forEach(function(l,i){ el.append("text").attr("class","nome").attr("x",10).attr("y",ls.length>1?18+i*16:24).text(l); });
+      el.append("text").attr("class","sub").attr("x",10).attr("y",H-9).text(k.s);
+      el.append("title").text(k.t);
+      el.on("click",function(ev){ ev.stopPropagation(); if(d.data.grupo){ alternar(d); } else if(d.data.unk){ abrirDesconhecido(d.data.unk); } else { abrir(d.data.id); } });
+    });
+    A.select(".tg").each(function(d){
+      var el=d3.select(this); el.selectAll("*").remove(); var k=kids(d); if(!k||!k.length) return;
+      el.attr("transform","translate("+(W+2)+","+(H/2)+")");
+      el.append("circle").attr("r",15);
+      el.append("text").text(d.children?"−":"+");
+      el.append("title").text(d.children?"Fechar este ramo":"Abrir este ramo");
+      el.on("click",function(ev){ ev.stopPropagation(); alternar(d); });
+    });
+  }
+  function alternar(d){ if(d.children){ d._children=d.children; d.children=null; } else if(d._children){ d.children=d._children; d._children=null; } atualizar(); }
+  function centrar(d,esc){
+    var r=box.getBoundingClientRect(); var s=esc||d3.zoomTransform(svg.node()).k||1;
+    svg.transition().duration(500).call(zoom.transform,d3.zoomIdentity.translate(r.width/2-(d.y+W/2)*s, r.height/2-d.x*s).scale(s));
+  }
+  window.grafoZoom=function(f){ svg.transition().duration(300).call(zoom.scaleBy,f); };
+  window.grafoCentralizar=function(){ root.descendants().forEach(function(d){ if(d.depth>=1 && (d.data.grupo||d.depth>=2) && d.children){ d._children=d.children; d.children=null; } }); atualizar(); var r=box.getBoundingClientRect(); if(!r.width) return; var s=r.width<640?0.78:Math.min(1, Math.max(0.45, r.width/(3*DX+W+40))); svg.transition().duration(400).call(zoom.transform,d3.zoomIdentity.translate(20, r.height/2).scale(s)); };
+  window.grafoAbrirTudo=function(){ (function abre(d){ if(d._children){ d.children=d._children; d._children=null; } (d.children||[]).forEach(abre); })(root); atualizar(); var r=box.getBoundingClientRect(); svg.transition().duration(400).call(zoom.transform,d3.zoomIdentity.translate(20,r.height/2).scale(0.35)); };
+  window.grafoRecolher=function(){ window.grafoCentralizar(); };
+  window.grafoFocar=function(id){
+    var alvo=null;
+    (function busca(d){ if(alvo) return; if(d.data.id===id){ alvo=d; return; } (kids(d)||[]).forEach(busca); })(root);
+    if(!alvo) return false;
+    var a=alvo.parent; while(a){ if(a._children){ a.children=a._children; a._children=null; } a=a.parent; }
+    atualizar(); ir("arvoreTopo");
+    setTimeout(function(){
+      centrar(alvo,1);
+      gn.selectAll("g.no").classed("hl",function(d){return d===alvo;});
+      setTimeout(function(){ gn.selectAll("g.no").classed("hl",false); },4500);
+    },350);
+    return true;
+  };
+  atualizar();
+  window.grafoCentralizar();
+  GRAFO=root;
+}
+
 montar();
 desenharRoda();
+try{ desenharGrafo(); }catch(e){ console.error(e); document.getElementById("grafo").style.display="none"; document.getElementById("grafoAviso").style.display="block"; document.getElementById("listaArvore").open=true; }
 try{ iniciarMapa(); }catch(e){ document.getElementById("mapa").style.display="none"; document.getElementById("mapaAviso").style.display="block"; }
+document.querySelectorAll(".navbar button").forEach(function(b){ b.addEventListener("click",function(){ mostrarAba(b.getAttribute("data-ir")); }); });
+window.addEventListener("hashchange",function(){ var h=location.hash.slice(1); if(h) mostrarAba(h); });
+(function(){ var h=location.hash.slice(1), s=null; try{ s=localStorage.getItem("arvoreValentina_aba"); }catch(e){} mostrarAba(h||s||"inicio"); })();
 </script>
 </body>
 </html>

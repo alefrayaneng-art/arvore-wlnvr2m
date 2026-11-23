@@ -50,6 +50,9 @@ button:focus-visible,[tabindex]:focus-visible,input:focus-visible,textarea:focus
 .p .st{font-size:.78rem;font-weight:bold;display:block}
 .p.ok .st{color:var(--ok)} .p.ask .st{color:var(--ask)}
 .p .tap{font-size:.78rem;color:#444;display:block;margin-top:.2rem}
+.p .aj{display:block;font-size:.8rem;font-weight:bold;background:#fff7cc;border:2px solid #d4a800;border-radius:.4rem;padding:.15rem .35rem;margin-top:.3rem;color:#5a4500}
+.ajudou{background:#fff7cc;border:3px solid #d4a800;border-radius:.7rem;padding:.6rem .9rem;margin:.6rem 0}
+.ajudou ul{margin:.3rem 0 0 1.1rem;padding:0}
 .note{background:#fff;border-left:6px solid var(--ask);padding:.5rem .8rem;margin:.6rem 0;border-radius:.4rem;font-size:.92rem}
 .story{background:#fff;border:3px dashed var(--ask);border-radius:.8rem;padding:.7rem 1rem;margin:.7rem 0}
 .story h3{color:var(--ask)}
@@ -110,6 +113,8 @@ textarea{min-height:7rem}
     </div>
   </div>
 </header>
+
+<div style="max-width:62rem;margin:0 auto;padding:0 .8rem"><div class="ajudou" id="ajudou"></div></div>
 
 <div class="legend"><div>
   <span class="chip ok">✔ VERDE = já temos documento (certidão, registro)</span>
@@ -232,16 +237,20 @@ var ZAP = "5519997957925";
 /* ===== DADOS ===== */
 // c = confirmado com documento; p = ainda não confirmado
 var P = {
- silvano:{n:"Silvano Valmor Valentina",d:"Nasceu em Joinville/SC",s:"c",
+ silvano:{n:"Silvano Valmor Valentina",d:"Nasceu em 1975, Joinville/SC",s:"c",aj:"Contou a história da família pelo WhatsApp",
   sabe:["É filho de Valmor e Irani (consta no RG dele).","Casou no civil com Celiane (registro em Alto Paraíso/RO)."],
   falta:["Certidão de nascimento (data e cartório exatos)."],q:"Você tem a certidão de nascimento do Silvano?"},
- celiane:{n:"Celiane Ramalho de Souza Valentina",d:"Nasceu em 30/08/1974, no Sítio Sabonete, Diamante/PB",s:"c",
+ celiane:{n:"Celiane Ramalho de Souza Valentina",d:"Nasceu em 1974, no Sítio Sabonete, Diamante/PB",s:"c",aj:"Enviou a certidão de nascimento e o RG",
   sabe:["Certidão de nascimento lida: filha de Hilário Xavier de Souza e Juracy Ramalho de Souza.","Registro feito em 1976 no cartório de Boa Ventura/PB."],
-  falta:["Certidão de casamento de Hilário e Juracy."],q:"Alguém sabe por que o registro só foi feito em 1976?"},
- alef:{n:"Alef Rayan Souza Valentina",d:"Nasceu em 06/05/1994, Ariquemes/RO",s:"c",sabe:["Certidão de nascimento conferida."],falta:[],q:""},
- irmaos:{n:"Alyson, Álex e Adrian",d:"Filhos de Silvano e Celiane",s:"p",
-  sabe:["Os nomes e os pais estão certos.","Alyson: nasceu em 21/07/1995, Alto Paraíso/RO (casamento publicado em 2020)."],
-  falta:["Cópia da certidão de nascimento de cada um (confirmar datas)."],q:"Quem tem as certidões deles em casa?"},
+  falta:["Certidão de casamento com Silvano (inteiro teor)."],q:"Alguém sabe por que o registro só foi feito em 1976?"},
+ alef:{n:"Alef Rayan Souza Valentina",d:"Nasceu em 1994, Ariquemes/RO",s:"c",aj:"Está juntando tudo nesta árvore",sabe:["Certidão de nascimento conferida."],falta:[],q:""},
+ irmaos:{n:"Os quatro netos: Alef, Alyson, Álex e Adrian",d:"Filhos de Silvano e Celiane",s:"c",
+  sabe:["Toque no nome de cada um, logo abaixo da árvore, para ver os detalhes."],falta:[],q:""},
+ alyson:{n:"Alyson Alan Souza Valentina",d:"Nasceu em 1995, Alto Paraíso/RO",s:"p",aj:"Recebeu o caderno da vó Irani",
+  sabe:["Os pais estão certos (aparece no edital do casamento dele, em 2020)."],falta:["Cópia da certidão de nascimento."],q:""},
+ alex:{n:"Álex Silvano Souza Valentina",d:"Nasceu em 1996, Ariquemes/RO",s:"p",
+  sabe:["Provavelmente é ele quem começou a árvore no site FamilySearch em 2023 (usuário “Álex47”)."],falta:["Cópia da certidão de nascimento."],q:"Álex, foi você que começou a árvore no FamilySearch?"},
+ adrian:{n:"Adrian Ryan Souza Valentina",d:"Nasceu em 2001",s:"p",sabe:["Filho de Silvano e Celiane."],falta:["Cópia da certidão de nascimento (confirmar se é “Ryan” ou “Rian”)."],q:""},
 
  aristides:{n:"Aristides Domingos da Rosa",d:"Natural de Cangueri, Imaruí/SC",s:"c",
   sabe:["Consta como pai de Manoel Valentina no óbito de 1995."],falta:["Quando nasceu e morreu.","Quem eram os pais dele."],q:"Alguém em SC lembra dele? Ele tinha o apelido “Toda”?"},
@@ -288,12 +297,12 @@ var P = {
   sabe:["Documento de 1971: filha de José Inácio dos Santos e de uma Campos dos Santos.","Professora. Foi quem anotou tudo no caderno que ajudou esta árvore."],
   falta:["Certidão de nascimento (confirmar a data)."],q:""},
 
- hilario:{n:"Hilário Xavier de Souza",d:"Paraíba. Morou em Boa Ventura, Diamante e depois em Rondônia",s:"c",
-  sabe:["Consta como pai da Celiane (certidão e RG).","Casou com Juracy em 26/01/1969, em Itaporanga/PB (registro encontrado)."],
-  falta:["Certidão de nascimento e de casamento.","Os irmãos: Assis, “Tota” (falecido em 2026), Naldo, Diassis e talvez Laura."],q:"Laura era irmã do vô Hilário? E quem eram “Cosme e Damião”?"},
- juracy:{n:"Juracy Ramalho de Souza",d:"Nasceu por volta de 1946, Paraíba",s:"c",
-  sabe:["Consta como mãe da Celiane. É o nome que aparece escrito com “y”.","No óbito da mãe dela (1977) aparece como filha, com 31 anos."],
-  falta:["Certidão de nascimento e de casamento."],q:"Qual o dia do aniversário da vó Juracy?"},
+ hilario:{n:"Hilário Xavier de Souza",d:"Nasceu em 1943, Diamante/PB",s:"c",
+  sabe:["Certidão de casamento lida (enviada pela tia Lucilene): nasceu em Diamante/PB, filho de Manoel Xavier de Souza e Cândida Maria da Conceição.","Casou com Juracy em 26/01/1969, em Itaporanga/PB.","Morou em Diadema/SP por volta de 1978 e depois em Rondônia."],
+  falta:["Certidão de nascimento dele.","A lista completa dos irmãos."],q:"Quem eram “Cosme e Damião” na família?"},
+ juracy:{n:"Juracy Ramalho de Souza",d:"Nasceu em 1946, Diamante/PB",s:"c",
+  sabe:["Certidão de casamento lida: nasceu em Diamante/PB, filha de Miguel Mariano e Julieta Ramalho.","É o nome que aparece escrito com “y”."],
+  falta:["Certidão de nascimento dela."],q:"A vó Juracy lembra dos avós dela? Como se chamavam?"},
  manoelxavier:{n:"Manoel Xavier de Souza",d:"Paraíba (Boa Ventura/Diamante)",s:"c",
   sabe:["Consta como pai do Hilário na certidão da Celiane."],falta:["Data e local de nascimento e de morte.","Quem eram os pais dele. Ainda não sabemos."],q:"Alguém sabe de onde veio a família Xavier?"},
  candida:{n:"Cândida Maria da Conceição",d:"Paraíba. “Dona Cândida”",s:"c",
@@ -317,12 +326,75 @@ var P = {
   sabe:["Lucilene, Maria Neide, Célio, Cícero e Selma (segundo a família)."],falta:["Datas de nascimento e cidades."],q:"Faltou algum irmão ou irmã da Celiane?"}
 };
 
+/* ===== TIOS, TIAS E PARENTES (um quadradinho para cada) ===== */
+function T(n,d,s,sabe,falta,q,aj){ return {n:n,d:d,s:s,sabe:sabe,falta:falta||["Data e cidade de nascimento.","Com quem casou e os nomes dos filhos."],q:q||"Você conhece? Conte o que sabe!",aj:aj}; }
+var cad="Nome escrito no caderno da vó Irani.";
+Object.assign(P,{
+ // irmãos do Silvano
+ paulo:T("Paulo Valmor Valentina","Irmão do Silvano","p",["Casado com Rosane Souza. Filhos: Ian Paulo e Luan Paulo."]),
+ eliane:T("Eliane Valentina de Carvalho","Irmã do Silvano","p",["Casada com Altair Carvalho. Filhos: Anne Kelly, Altair, Lucas e Luan."]),
+ jackson:T("Jackson Valmor Valentina","Irmão do Silvano","p",["Filhos: Gabriela, Rafaela, Abner e Vitória."]),
+ valmorbebe:T("Valmor Valentina (bebê)","Irmão do Silvano","c",["Nasceu e faleceu em 25/05/1977, em Santa Catarina. Há registro."],["Nada mais a buscar."],"A família lembra dele?"),
+ vania:T("Vânia Valentina","Meia-irmã do Silvano","p",["Filha do segundo casamento do vô Valmor."]),
+ // irmãos da Celiane
+ selma:T("Selma Ramalho de Souza","Irmã da Celiane","p",["Filha de Hilário e Juracy, segundo a família."],null,"Tia Selma, em que cidade você nasceu?"),
+ lucilene:T("Lucilene Ramalho de Souza","Irmã da Celiane. Mora em Alto Paraíso/RO","p",["Filha de Hilário e Juracy.","Conseguiu a certidão de casamento dos pais, que confirmou as datas e a cidade dos avós."],["A certidão de nascimento dela (cidade e data)."],"Tia Lucilene, você nasceu em São Paulo?","Enviou a certidão de casamento do vô Hilário e da vó Juracy"),
+ neide:T("Maria Neide Ramalho de Souza","Irmã da Celiane. Nasceu em 1978, São Bernardo do Campo/SP","c",["Certidão de nascimento lida: filha de Hilário e Juracy, que moravam em Diadema/SP.","Traz os quatro avós: Julieta Ramalho, Miguel Mariano, Cândida Maria da Conceição e Manoel Xavier de Souza."],["Nada urgente. Obrigado!"],"","Enviou a foto da certidão de nascimento dela"),
+ celio:T("Célio Ramalho de Souza","Irmão da Celiane","p",["Filho de Hilário e Juracy, segundo a família."],null,"Tio Célio, em que cidade você nasceu?"),
+ cicero:T("Cícero Ramalho de Souza","Irmão da Celiane","p",["Filho de Hilário e Juracy. Nasceu em Boa Ventura/PB e lembra de lá desde os 3 anos (segundo o grupo da família)."],null,"Tio Cícero, o que você lembra de Boa Ventura?"),
+ // irmãos do Valmor (caderno da vó Irani)
+ v_jose:T("José Rosa","Irmão do vô Valmor","p",[cad,"Repare: usa “Rosa”, o sobrenome do avô Aristides."]),
+ v_lorival:T("Lorival","Irmão do vô Valmor (falecido)","p",[cad,"Já faleceu."]),
+ v_lorena:T("Lorena","Irmã do vô Valmor","p",[cad]),
+ v_madalena:T("Madalena (“Preta”)","Irmã do vô Valmor","p",[cad,"Pode ser a Madalena Valentina de Joinville."]),
+ v_helena:T("Helena","Irmã do vô Valmor","p",[cad]),
+ v_filomena:T("Filomena (“Mena”)","Irmã do vô Valmor","p",[cad]),
+ v_bernadete:T("Bernadete (“Det”)","Irmã do vô Valmor","p",[cad,"Pode ser a “tia Det”, Bernadete Valentina de Oliveira."]),
+ v_antonio:T("Antônio (“Nica”)","Irmão do vô Valmor","p",[cad]),
+ v_guiomar:T("Guiomar","Irmã do vô Valmor (morreu bebê)","p",[cad,"Morreu ainda bebê."],["Nada mais a buscar, só confirmar."]),
+ v_joaquim:T("Joaquim (“Kinca”)","Irmão do vô Valmor","p",[cad]),
+ // irmãos da Irani
+ s_anania:T("Anania","Irmã ou irmão da vó Irani (1939, bebê)","c",["Morreu bebê em 1939, em Parnaso/SP. Há registro.","No caderno talvez apareça como “Ananias”."],["Nada mais a buscar."],""),
+ s_amaniar:T("Amaniar","Irmã ou irmão da vó Irani (1940 a 1941)","c",["Morreu bebê, em Parnaso/SP. Há registro.","No caderno talvez apareça como “Aramira”."],["Nada mais a buscar."],""),
+ s_irandir:T("Irandir","Irmão da vó Irani (1946, bebê)","c",["Morreu bebê em 1946, em Parnaso/SP. Há registro."],["Nada mais a buscar."],""),
+ s_francina:T("Francina (?)","Irmã da vó Irani","p",[cad+" A letra está difícil de ler.","O caderno indica que já faleceu."],["Confirmar o nome."],"Qual era o nome certo dela?"),
+ s_jaci:T("Jaci","Irmã ou irmão da vó Irani","p",[cad,"O caderno indica que faleceu criança."],["Confirmar."],""),
+ s_orandi:T("Orandi","Irmão da vó Irani","p",[cad,"O caderno indica que faleceu jovem, com 18 anos."],["Confirmar."],""),
+ s_ananias:T("Ananias","Irmão da vó Irani","p",["Esposa: Adelina.","No caderno o nome “Ananias” aparece três vezes: pode ser que os pais tenham repetido o nome depois de perder dois bebês."]),
+ s_natanael:T("Natanael","Irmão da vó Irani (vivo)","p",[cad+" Tem cerca de 74 anos."]),
+ s_paulo:T("Paulo","Irmão da vó Irani (vivo)","p",[cad+" Tem cerca de 73 anos."]),
+ s_debora:T("Débora","Irmã da vó Irani (viva)","p",[cad+" Tem cerca de 72 anos."]),
+ s_jose:T("José","Irmão da vó Irani (falecido)","p",[cad,"Esposa: Luiza."]),
+ s_guiomar:T("Guiomar Inácio Dalagnolly Valentina","Irmã da vó Irani (viva)","p",[cad+" Tem cerca de 69 anos.","Casou com um irmão do vô Valmor. Por isso tem o sobrenome Valentina."],["Com qual irmão do Valmor ela casou?"],"Tia Guiomar, com qual irmão do Valmor a senhora casou?"),
+ s_dagmar:T("Dagmar","Irmã da vó Irani (morreu bebê)","p",[cad,"Morreu ainda bebê."],["Confirmar."],""),
+ s_justino:T("Justino","Irmão da vó Irani (vivo)","p",[cad,"Tem o nome do avô, Justino Campos Bahia."]),
+ s_silas:T("Silas","Irmão da vó Irani (vivo)","p",[cad]),
+ s_samuel:T("Samuel","Irmão da vó Irani (falecido)","p",[cad]),
+ s_iracema:T("Iracema","Irmã da vó Irani","p",["Aparece num documento de herdeiros, mas não no caderno."],["Confirmar se é irmã."],"Iracema é irmã da vó Irani?"),
+ // irmãos do Hilário
+ h_assis:T("Assis Xavier (“Tota”)","Irmão do vô Hilário (falecido em 14/01/2026)","p",["Pai da Idelvânia. Informação do grupo da família."]),
+ h_naldo:T("Naldo (“Naldinho”)","Irmão do vô Hilário","p",["Pai da Adriana. Informação do grupo da família."]),
+ h_diassis:T("Diassis","Irmão do vô Hilário (vivo)","p",["Informação do grupo da família."]),
+ h_laura:T("Laura (?)","Talvez irmã do vô Hilário (faleceu em 06/2026)","p",["A prima Nena diz ser filha de Laura. Ainda não está claro se Laura era irmã do vô Hilário."],["Confirmar se era irmã."],"Laura era irmã do vô Hilário?"),
+ // irmãos da Juracy
+ j_expedito:T("Expedito","Irmão da vó Juracy","c",["Aparece como filho no óbito da mãe, Julieta (1977).","Casou com Maria. Uma filha mora no Mato Grosso do Sul."]),
+ j_josemariano:T("José Mariano","Irmão da vó Juracy","c",["Aparece como filho no óbito da mãe, Julieta (1977)."]),
+ j_severino:T("Severino","Irmão da vó Juracy","c",["Aparece como filho no óbito da mãe, Julieta (1977)."])
+});
+P.irani.aj="Escreveu o caderno com os nomes da família";
+
 // Montagem: cada grupo é uma lista de "linhas"; cada linha é uma lista de casais (arrays de ids)
 var G = {
- nucleo:[["Pais",[["silvano","celiane"]]],["Filhos",[["alef"],["irmaos"]]]],
- valentina:[["Trisavós (pais do Manoel)",[["aristides","valentinaines"]]],["Bisavós (pais do Valmor)",[["manoel","almecinda"]]],["Avô e avó",[["valmor","irani"]]],["Tios do Silvano",[["irmaosvalmor"]]]],
- santos:[["Quartos-avós (pais do Justino e da Balduína)",[["manoelcampos"],["marcolino"]]],["Trisavós",[["antonio","joaquina"],["justino","balduina"]]],["Bisavós (pais da Irani)",[["joseign","guiomar"]]],["Avó",[["irani"]]],["Irmãos da Irani",[["irmaosirani"]]]],
- ramalho:[["Origem mais antiga (a confirmar)",[["eduardo"]]],["Trisavós",[["manoeljose","virgulina"]]],["Bisavós",[["manoelxavier","candida"],["miguel","julieta"]]],["Avô e avó",[["hilario","juracy"]]],["Tios da Celiane",[["irmaosjuracy"],["irmaoshilario"],["filhoshilario"]]]]
+ nucleo:[["Pais",[["silvano","celiane"]]],["Os quatro netos",[["alef"],["alyson"],["alex"],["adrian"]]],
+  ["Tios e tias por parte do pai (irmãos do Silvano)",[["paulo"],["eliane"],["jackson"],["valmorbebe"],["vania"]]],
+  ["Tios e tias por parte da mãe (irmãos da Celiane)",[["selma"],["lucilene"],["neide"],["celio"],["cicero"]]]],
+ valentina:[["Trisavós (pais do Manoel)",[["aristides","valentinaines"]]],["Bisavós (pais do Valmor)",[["manoel","almecinda"]]],["Avô e avó",[["valmor","irani"]]],
+  ["Irmãos do vô Valmor (os 10 filhos de Manoel e Maria)",[["v_jose"],["v_lorival"],["v_lorena"],["v_madalena"],["v_helena"],["v_filomena"],["v_bernadete"],["v_antonio"],["v_guiomar"],["v_joaquim"]]]],
+ santos:[["Quartos-avós (pais do Justino e da Balduína)",[["manoelcampos"],["marcolino"]]],["Trisavós",[["antonio","joaquina"],["justino","balduina"]]],["Bisavós (pais da Irani)",[["joseign","guiomar"]]],["Avó",[["irani"]]],
+  ["Irmãos da vó Irani (o caderno fala em 18 filhos)",[["s_anania"],["s_amaniar"],["s_francina"],["s_jaci"],["s_irandir"],["s_orandi"],["s_ananias"],["s_natanael"],["s_paulo"],["s_debora"],["s_jose"],["s_guiomar"],["s_dagmar"],["s_justino"],["s_silas"],["s_samuel"],["s_iracema"]]]],
+ ramalho:[["Origem mais antiga (a confirmar)",[["eduardo"]]],["Trisavós",[["manoeljose","virgulina"]]],["Bisavós",[["manoelxavier","candida"],["miguel","julieta"]]],["Avô e avó",[["hilario","juracy"]]],
+  ["Irmãos do vô Hilário",[["h_assis"],["h_naldo"],["h_diassis"],["h_laura"]]],
+  ["Irmãos da vó Juracy",[["j_expedito"],["j_josemariano"],["j_severino"]]]]
 };
 
 var HIST = [
@@ -334,7 +406,6 @@ var HIST = [
 ];
 
 var TAREFAS = [
- ["Certidão de casamento do vô Hilário e da vó Juracy","Eles se casaram em 26/01/1969, em Itaporanga/PB. Se não tiver a certidão, vale a data e a igreja onde casaram."],
  ["Certidão de nascimento do vô Hilário e da vó Juracy","Ela traz o nome completo dos pais e avós. É a chave para voltar mais uma geração."],
  ["Certidão de casamento do vô Valmor e da vó Irani (1971) e de nascimento do vô Valmor","Foram feitas em Florianópolis. Servem para acertar a grafia dos nomes."],
  ["Saber se a bisavó Maria Almecinda ainda vive, onde mora e o nome certo","Se tiver RG ou foto, melhor ainda."],
@@ -356,6 +427,7 @@ function card(id){
   return '<button class="p '+(ok?'ok':'ask')+'" data-id="'+id+'" onclick="abrir(\''+id+'\')">'
    +'<span class="nm">'+p.n+'</span><span class="dt">'+p.d+'</span>'
    +'<span class="st">'+(ok?'✔ Confirmado com documento':'? Ainda não confirmado')+'</span>'
+   +(p.aj?'<span class="aj">🏅 '+p.aj+'</span>':'')
    +'<span class="tap">👆 Toque aqui</span></button>';
 }
 function montar(){
@@ -373,6 +445,10 @@ function montar(){
     });
     document.getElementById("g-"+k).innerHTML=h;
   });
+  var aj=Object.keys(P).filter(function(k){return P[k].aj;});
+  document.getElementById("ajudou").innerHTML='<b>🏅 Quem já ajudou a montar esta árvore (obrigado!):</b><ul>'
+    +aj.map(function(k){var AP={silvano:"Pai Silvano",celiane:"Mãe Celiane",alef:"Alef",alyson:"Alyson",irani:"Vó Irani",lucilene:"Tia Lucilene",neide:"Tia Neide"};return '<li><a href="#" onclick="abrir(\''+k+'\');return false"><b>'+(AP[k]||CURTO[k]||P[k].n)+'</b></a>: '+P[k].aj+'</li>';}).join("")
+    +'</ul><p style="margin:.4rem 0 0">Você também pode entrar nesta lista: mande uma foto de certidão, RG, foto antiga, ou conte uma lembrança.</p>';
   document.getElementById("historias").innerHTML=HIST.map(function(h,i){
     return '<div class="story"><h3>'+h.t+'</h3><p>'+h.x+'</p><p><b>Pergunta:</b> '+h.q+'</p>'
      +'<button onclick="abrirHist('+i+')">✏️ Eu sei algo sobre isso</button></div>';
@@ -391,7 +467,7 @@ function li(a){ return a.length? a.map(function(x){return "<li>"+x+"</li>";}).jo
 function abrir(id){
   var p=P[id]; atual={tipo:"pessoa",id:id,rot:p.n};
   document.getElementById("pNome").textContent=p.n;
-  document.getElementById("pSt").innerHTML=p.s==="c"?'<span class="chip ok">✔ Confirmado com documento</span>':'<span class="chip ask">? Ainda não confirmado</span>';
+  document.getElementById("pSt").innerHTML=(p.s==="c"?'<span class="chip ok">✔ Confirmado com documento</span>':'<span class="chip ask">? Ainda não confirmado</span>')+(p.aj?' <span class="chip" style="background:#fff7cc;border:3px solid #d4a800;color:#5a4500">🏅 '+p.aj+'</span>':'');
   document.getElementById("pSabe").innerHTML=li(p.sabe);
   document.getElementById("pFalta").innerHTML=li(p.falta);
   var q=document.getElementById("pPerg"); q.style.display=p.q?"block":"none"; q.innerHTML="<b>Pergunta:</b> "+p.q;
@@ -601,21 +677,23 @@ var LUG = [
  ["Bonito de Santa Fé (PB)",-7.31,-38.51,"ramalho","c","Julieta Ramalho de Sousa nasceu aqui em 10/01/1905.","Óbito de Julieta (1977)"],
  ["Conceição (PB)",-7.56,-38.51,"ramalho","p","Manoel José de Souza e Virgulina Ramalho teriam se casado aqui (1907). É também a cidade natal da Elba Ramalho.","Árvore pública na internet (a confirmar)"],
  ["Ibiara (PB)",-7.50,-38.41,"ramalho","p","Terra do ramo “Pinto Ramalho”, segundo livro de história de 1985.","Livro “Conceição do Piancó de Ontem e de Hoje” (a ler)"],
- ["Itaporanga (PB)",-7.30,-38.15,"ramalho","c","Hilário e Juracy se casaram aqui em 26/01/1969.","Registro de casamento (livro B-37)"],
- ["Diamante (PB), Sítio Sabonete",-7.42,-38.26,"ramalho","c","Celiane nasceu no Sítio Sabonete em 30/08/1974. A família de Hilário e Juracy morava na região.","Certidão de nascimento da Celiane"],
+ ["Itaporanga (PB)",-7.30,-38.15,"ramalho","c","Hilário e Juracy se casaram aqui em 26/01/1969.","Certidão de casamento enviada pela tia Lucilene"],
+ ["Diamante (PB), Sítio Sabonete",-7.42,-38.26,"ramalho","c","O vô Hilário (1943) e a vó Juracy (1946) nasceram em Diamante. Celiane nasceu no Sítio Sabonete em 1974.","Certidão de casamento dos avós e certidão da Celiane"],
  ["Boa Ventura (PB)",-7.42,-38.21,"ramalho","c","Julieta morreu aqui em 1977. A certidão da Celiane foi registrada aqui em 1976.","Óbito de Julieta e certidão da Celiane"],
- ["Diadema (SP)",-23.69,-46.62,"ramalho","p","A família de Hilário e Juracy teria morado aqui por volta de 1978.","Documento citado na pesquisa, ainda não visto"],
+ ["Diadema (SP)",-23.69,-46.62,"ramalho","c","Hilário e Juracy moravam aqui em 1978.","Certidão de nascimento da tia Neide"],
  ["Ariquemes (RO)",-9.91,-63.04,"todos","c","Alef nasceu aqui em 1994. O vô Hilário aparece morando na comarca.","Certidão do Alef; Diário da Justiça de RO"],
- ["Alto Paraíso (RO)",-9.71,-63.32,"todos","c","Silvano e Celiane se casaram aqui. Os netos foram registrados aqui. A bisavó Guiomar morreu aqui em 2008, e o caderno diz que José e Guiomar estão sepultados aqui.","Certidões, RGs e óbito de Guiomar"]
+ ["Alto Paraíso (RO)",-9.71,-63.32,"todos","c","Silvano e Celiane se casaram aqui. Os netos foram registrados aqui. A bisavó Guiomar morreu aqui em 2008, e o caderno diz que José e Guiomar estão sepultados aqui.","Certidões, RGs e óbito de Guiomar"],
+ ["São Bernardo do Campo (SP)",-23.69,-46.56,"ramalho","c","A tia Neide nasceu aqui em 1978, no Hospital São Bernardo.","Certidão de nascimento da tia Neide"]
 ];
 // caminhos de cada ramo (índices de LUG, em ordem de tempo)
 var CAM = {valentina:[0,1,2,18], santos:[6,5,3,8,9,1,18], ramalho:[10,11,13,14,15,16,17,18]};
 var COR = {valentina:"#1f5fbf", santos:"#7a3fa8", ramalho:"#8a5a2b", todos:"#2d2a26"};
 // pessoa -> lugares (índices de LUG)
-var LP = {aristides:[0],valentinaines:[0],manoel:[0],almecinda:[0],valmor:[0,1],irmaosvalmor:[0],irani:[9,1,18],silvano:[2,18],
- antonio:[3],joaquina:[3],joseign:[3,4,8,9,18],guiomar:[5,8,9,18],justino:[6,5],balduina:[6],manoelcampos:[6],marcolino:[7],irmaosirani:[9],
- julieta:[10,15],manoeljose:[11],virgulina:[11],eduardo:[12],hilario:[13,14,17],juracy:[13,14,16],miguel:[15],irmaosjuracy:[15],
- celiane:[14,15,18],alef:[17],irmaos:[18],filhoshilario:[14,16,18]};
+var LP = {aristides:[0],valentinaines:[0],manoel:[0],almecinda:[0],valmor:[0,1],irani:[9,1,18],silvano:[2,18],valmorbebe:[0],
+ antonio:[3],joaquina:[3],joseign:[3,4,8,9,18],guiomar:[5,8,9,18],justino:[6,5],balduina:[6],manoelcampos:[6],marcolino:[7],
+ s_anania:[9],s_amaniar:[9],s_irandir:[9],
+ julieta:[10,15],manoeljose:[11],virgulina:[11],eduardo:[12],hilario:[14,13,16,17],juracy:[14,13,16],miguel:[15],j_expedito:[15],j_josemariano:[15],j_severino:[15],
+ celiane:[14,15,18],alef:[17],alyson:[18],alex:[17],irmaos:[18],neide:[19,16],lucilene:[18],cicero:[15]};
 var mapa=null, camadas={}, MARC={};
 function iniciarMapa(){
   document.getElementById("listaLugares").innerHTML=LUG.map(function(l){
@@ -648,6 +726,82 @@ function verRamo(r){
 
 var fs=20;
 function zoom(d){ fs=Math.max(16,Math.min(30,fs+d)); document.documentElement.style.setProperty("--fs",fs+"px"); }
+/* ===== ATUALIZAÇÃO COM O DOSSIÊ CONSOLIDADO (23/11/2026) ===== */
+(function(){
+  function add(id,campo,txt){ if(P[id]) P[id][campo]=(P[id][campo]||[]).concat(txt); }
+  // filhos e cônjuges (primos e primas)
+  add("selma","sabe","Filhos: Diego, Ericsson e Wellington Patrick.");
+  add("celio","sabe","Filhos: Natieli, Eduardo e Letícia.");
+  add("neide","sabe","Filhos: Vitor Hugo e Natália. Mora em Goiânia/GO.");
+  add("lucilene","sabe",["Marido: Marcos André. Filhos: Maicon, Kauã e mais um (o nome varia entre as listas).","A família dizia que só ela tinha nascido em São Paulo. Mas a tia Neide também nasceu lá."]);
+  add("cicero","sabe","Faz aniversário em 16 de dezembro. Mora em Rondônia.");
+  add("eliane","sabe","O Lucas é casado com a Brenda.");
+  add("v_madalena","sabe","Mora em Joinville/SC.");
+  add("s_debora","sabe","Mora em Sorocaba/SP. Filhos: Robson e Rosana.");
+  add("s_natanael","sabe","Mora em São Paulo.");
+  add("s_justino","sabe","Mora em Mato Grosso.");
+  add("s_silas","sabe","Mora em Rondônia.");
+  add("s_paulo","sabe","Mora em Rondônia. Foi testemunha do casamento do Silvano e da Celiane (1998).");
+  add("s_iracema","sabe","Filhos: Roseli e Wilson. Neta: Patrícia (“Patt”).");
+  add("s_samuel","sabe","Filho: Fabrício.");
+  add("j_expedito","sabe","Tinha 34 anos em 1977, então nasceu por volta de 1943, como o vô Hilário. Uma Francisca de Souza (MS) fala de um “tio Expedito” que brincava com o Hilário: pode ser o mesmo.");
+  add("j_josemariano","sabe","Tinha 32 anos em 1977 (nasceu por volta de 1945).");
+  add("j_severino","sabe","Tinha 26 anos em 1977 (nasceu por volta de 1951).");
+  add("h_assis","sabe","A Leonice, do grupo da família, diz ser “a neta mais velha de dona Cândida”.");
+  // correções e detalhes
+  add("almecinda","sabe","Se ela tem 98 anos, nasceu por volta de 1928.");
+  add("manoel","sabe","Os apelidos “Toda” (ou “Totoda”) e “Tintina”, que a família lembra, parecem ser do pai de criação e da mãe dele.");
+  add("juracy","falta","Conferir: a certidão dá 30/08 como aniversário dela, o mesmo dia e mês da filha Celiane. Coincidência ou erro de escrita?");
+  add("miguel","sabe",["Segundo uma árvore pública, viveu de 1907 a 1993 e era filho de Mariano Rodrigues e Maria Alexandre (a confirmar).","No óbito da Julieta (1977) aparece como “natural da Paraíba, agricultor”."]);
+  add("manoelxavier","sabe","Há um candidato: um Manoel Xavier de Souza (1913 a 1994, Boa Ventura), filho de João Xavier de Sousa e Generosa Maria da Conceição. Mas o óbito dele diz “solteiro”, então a pista ficou fraca.");
+  add("julieta","sabe","Irmãos dela, segundo a árvore pública: José (1896 a 1986), João (1916 a 1981), Antônio, Fausta e Maria Luiza.");
+  add("manoeljose","sabe","Segundo a árvore pública, era filho de Estendeslau de Souza Borge e Rita Maria da Conceição. Mas as datas dessa árvore têm erros.");
+  add("virgulina","falta","A árvore pública diz que ela casou em 1907, mas os filhos nascem de 1896 em diante. Pode ser um casamento feito depois.");
+  add("guiomar","falta","Uma certidão diz que ela era “natural do Ceará”, e outra diz Caetité (BA). Qual é a certa?");
+  add("justino","falta","O casamento dele com a Balduína aparece em 1920, depois do nascimento da Guiomar (1918). Pode ter sido para regularizar.");
+  add("valmor","sabe","No jornal de 1971 o nome saiu errado: “Valmor Manoel Tolentina”, filho de “Manoel Valentino”.");
+  add("irani","sabe",["É a 5ª dos 18 filhos de José e Guiomar.","Em 1971 era missionária. Depois foi professora de Português."]);
+  P.cicero.aj="Contou lembranças no grupo da família";
+  P.alex.aj="Começou a árvore no FamilySearch em 2023 (provavelmente)";
+  // novas pessoas
+  Object.assign(P,{
+   s_julia:T("Júlia Inácio","“Tia” nos contatos do pai (Rondônia)","p",["Não aparece na lista dos 18 irmãos do caderno."],["Ela é irmã da vó Irani ou parente por casamento?"]),
+   s_olimpia:T("Olímpia Inácio","“Tia” nos contatos do pai (Rondônia)","p",["Não aparece na lista dos 18 irmãos do caderno."],["Ela é irmã da vó Irani ou parente por casamento?"]),
+   gessi:T("Gessi Valentina da Conceição","Possível meia-irmã do bisavô Manoel (Santa Catarina)","p",["Num jornal de 1965 aparece como filha de Gregório Henrique da Conceição e de Valentina Inês da Conceição, o mesmo nome da mãe do Manoel."],["Saber se é a mesma Valentina Inês."],"Alguém de SC conheceu a Gessi?"),
+   miguelmv:T("Miguel Manoel Valentina","Nome raro achado em SC (1950)","p",["Aparece numa lista oficial de Santa Catarina em 1950. Pode ser irmão, tio ou primo do Manoel."],["Quase nada: é só uma pista."],"Alguém já ouviu falar de um Miguel Valentina?"),
+   nena:T("Nena","Prima. Diz ser filha da Laura","p",["É casada com um João, que sofreu um acidente com alta tensão em 2025.","Conta-se que o marido seria primo do presidente Lula. Ver as histórias."],["O nome completo dela e o do marido."],"Qual é o nome completo da Nena?"),
+   leonice:T("Leonice","Prima. “Neta mais velha de dona Cândida”","p",["Participa do grupo de saúde do vô Hilário."],["De qual irmão do Hilário ela é filha?"],"Leonice, você é filha de qual irmão do vô Hilário?"),
+   marianorod:T("Mariano Rodrigues e Maria Alexandre","Pais do bisavô Miguel Mariano (segundo árvore pública)","p",["Nomes que aparecem numa árvore feita por outras pessoas no FamilySearch."],["Nenhum documento ainda."]),
+   estendeslau:T("Estendeslau de Souza Borge e Rita Maria da Conceição","Pais do trisavô Manoel José (segundo árvore pública)","p",["Estendeslau (1850) e Rita (1853), segundo a árvore pública."],["Nenhum documento ainda. As datas dessa árvore têm erros."]),
+   joaoxavier:T("João Xavier de Sousa e Generosa Maria da Conceição","Talvez pais do bisavô Manoel Xavier (pista fraca)","p",["Aparecem como pais de um Manoel Xavier de Souza (1913 a 1994) que pode ser o bisavô."],["A pista enfraqueceu: esse Manoel aparece como “solteiro”, e a Generosa achada na internet é de Pernambuco."],"Alguém lembra do nome dos avós do vô Hilário?")
+  });
+  CURTO.marianorod="Mariano e Maria"; CURTO.estendeslau="Estendeslau e Rita"; CURTO.joaoxavier="João e Generosa?";
+  // árvore: novas linhas
+  G.valentina.push(["Possíveis parentes do bisavô Manoel (pistas)",[["gessi"],["miguelmv"]]]);
+  G.santos[G.santos.length-1][1].push(["s_julia"],["s_olimpia"]);
+  G.ramalho.splice(1,0,["Pais dos bisavós (árvores da internet, a confirmar)",[["estendeslau"],["marianorod"],["joaoxavier"]]]);
+  G.ramalho.push(["Primos e primas do lado do vô Hilário",[["nena"],["leonice"]]]);
+  // roda: pais do Miguel e do Manoel José
+  ANEIS[4][14]="estendeslau";
+  ANEIS[3][12]="marianorod"; ANEIS[3][13]="marianorod";
+  ANEIS[3][8]="joaoxavier"; ANEIS[3][9]="joaoxavier";
+  // mapa: novos lugares (índices 20, 21, 22)
+  LUG.push(["São José de Piranhas (PB)",-7.12,-38.50,"ramalho","p","Antiga paróquia de Bonito de Santa Fé: o batismo da Julieta (1905) pode estar nos livros daqui.","Pesquisa nas dioceses (a confirmar)"]);
+  LUG.push(["Teixeira (PB)",-7.22,-37.25,"ramalho","p","Livros de batismo antigos onde pode estar um ancestral do ramo do Zé Ramalho.","Pesquisa do ChatGPT (hipótese)"]);
+  LUG.push(["Brejo do Cruz (PB)",-6.34,-37.50,"ramalho","p","Cidade natal do cantor Zé Ramalho. Será que somos parentes?","Hipótese da família"]);
+  LP.julieta=[10,15,20];
+  // histórias atualizadas
+  HIST[0].x="Elba nasceu em Conceição (PB), onde em 1907 casaram os trisavós Manoel José e Virgulina Ramalho. Ela e o compositor Luiz Ramalho dizem em entrevistas ser “do mesmo Ramalho”. Uma árvore da internet liga a Virgulina ao clã Pinto Ramalho e, por ele, ao ramo do Zé Ramalho. Se essa árvore estiver certa, a bisavó Julieta e o Zé Ramalho seriam primos distantes. Mas um dos elos dessa árvore não tem prova.";
+  HIST[1].x="Conta-se que a prima Nena, filha da Laura, casou com um João Inácio da Silva, primo do Lula. A pesquisa achou um João Inácio da Silva famoso, mas ele é o avô do Lula, não um primo. No grupo da família, a Nena fala só em “João”. Se for verdade, o parentesco seria por casamento, e não de sangue.";
+  HIST[2].x="O que a família contou, por escrito, é que os Souza da Paraíba tiveram brigas de terra CONTRA o bando de Lampião, e não que eram parentes dele. Nenhum sobrenome dos nossos bisavós aparece na família do Lampião.";
+  HIST.push({t:"👵 “Toda” e “Tintina”",x:"A família lembra de bisavós chamados “Toda” e “Tintina Valentina”. O caderno da vó Irani dá uma pista: “Totoda” seria o pai de criação do bisavô Manoel, e “Tintina”, o apelido da mãe dele (Constantina? Valentina?). O registro de óbito do Manoel diz que os pais eram Aristides Domingos da Rosa e Valentina Inês da Conceição.",q:"Quem eram o Totoda e a Tintina? Eram apelidos?"});
+  HIST.push({t:"👬 Cosme e Damião",x:"A família lembra de um “Cosme e Damião” do lado da mãe, mas não sabe se eram irmãos ou tios. Os gêmeos Cosme e Damião que a pesquisa achou em Ibiara (1953) não são da nossa família direta.",q:"De quem eram filhos o Cosme e o Damião?"});
+  // tarefas novas
+  TAREFAS.push(["Foto reta e com boa luz de cada página do caderno da vó Irani","Algumas partes estão borradas, como o começo da página dos 18 filhos."]);
+  TAREFAS.push(["Saber se a Laura era irmã do vô Hilário, e o nome completo da Nena","Ajuda a entender a história do primo do Lula."]);
+  TAREFAS.push(["Certidão de óbito da bisavó Cândida e do bisavô Manoel Xavier","Mostram os pais deles e abrem mais uma geração."]);
+})();
+
 montar();
 desenharRoda();
 try{ iniciarMapa(); }catch(e){ document.getElementById("mapa").style.display="none"; document.getElementById("mapaAviso").style.display="block"; }

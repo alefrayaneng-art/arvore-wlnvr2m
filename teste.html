@@ -1,0 +1,1194 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="googlebot" content="noindex, nofollow">
+<meta property="og:title" content="A história da nossa família">
+<meta property="og:description" content="Toque e ajude a completar a árvore da família.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🌳%3C/text%3E%3C/svg%3E">
+<title>A história da nossa família</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+:root{
+  --ok:#14663a; --ok-bg:#e1f4e7;
+  --ask:#a04a00; --ask-bg:#fff0d6;
+  --ink:#1b1b1b; --bg:#faf7f2; --card:#fff; --line:#cfc7b8; --blue:#0b4f8a;
+  --fs:20px;
+}
+*{box-sizing:border-box}
+html{font-size:var(--fs)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Verdana,Tahoma,Arial,sans-serif;line-height:1.5;padding-bottom:7rem}
+h1{font-size:1.7rem;margin:.2rem 0}
+h2{font-size:1.35rem;margin:2rem 0 .3rem;padding:.4rem .7rem;background:#2d2a26;color:#fff;border-radius:.5rem}
+h3{font-size:1.1rem;margin:.2rem 0}
+main{max-width:62rem;margin:0 auto;padding:0 .8rem}
+header{padding:1rem .8rem .2rem;max-width:62rem;margin:0 auto}
+.intro{background:#fff;border:2px solid var(--line);border-radius:.7rem;padding:.8rem 1rem;margin:.6rem 0}
+.tools{display:flex;gap:.5rem;flex-wrap:wrap;margin:.5rem 0}
+button,.btn{font:inherit;font-size:1rem;border-radius:.6rem;border:2px solid #444;background:#fff;color:#111;padding:.7rem 1rem;min-height:3rem;cursor:pointer}
+button.main,.btn.main{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:bold}
+button:focus-visible,[tabindex]:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:4px solid #ffb300;outline-offset:2px}
+.legend{position:sticky;top:0;z-index:5;background:#fffdf8;border-bottom:3px solid #2d2a26;padding:.5rem .8rem}
+.legend div{max-width:62rem;margin:0 auto;display:flex;gap:1rem;flex-wrap:wrap;align-items:center;font-weight:bold;font-size:.9rem}
+.chip{display:inline-flex;align-items:center;gap:.4rem;padding:.25rem .6rem;border-radius:.5rem}
+.chip.ok{background:var(--ok-bg);border:3px solid var(--ok);color:var(--ok)}
+.chip.ask{background:var(--ask-bg);border:3px dashed var(--ask);color:var(--ask)}
+.gen{margin:1rem 0}
+.gen>.lab{font-weight:bold;color:#555;margin:.2rem 0;font-size:.9rem;text-transform:uppercase;letter-spacing:.04em}
+.row{display:flex;flex-wrap:wrap;gap:.8rem;justify-content:center;align-items:stretch}
+.couple{display:flex;flex-wrap:wrap;gap:.3rem;align-items:center;justify-content:center;background:#efe9dc;border-radius:.8rem;padding:.5rem}
+.couple .amp{font-size:1.6rem;font-weight:bold;color:#555}
+.down{text-align:center;font-size:1.4rem;color:#777;margin:.1rem 0}
+.p{width:15.5rem;max-width:100%;text-align:left;border-radius:.7rem;padding:.6rem .7rem;cursor:pointer;display:block}
+.p.ok{background:var(--ok-bg);border:3px solid var(--ok)}
+.p.ask{background:var(--ask-bg);border:3px dashed var(--ask)}
+.p .nm{font-weight:bold;font-size:1.02rem;line-height:1.25;display:block}
+.p .dt{font-size:.82rem;display:block;margin:.15rem 0}
+.p .st{font-size:.78rem;font-weight:bold;display:block}
+.p.ok .st{color:var(--ok)} .p.ask .st{color:var(--ask)}
+.p .tap{font-size:.78rem;color:#444;display:block;margin-top:.2rem}
+.p .fsl{display:block;font-size:.82rem;font-weight:bold;color:#0b4f8a;text-decoration:underline;margin:.15rem 0;padding:.25rem 0;cursor:pointer}
+.p .fsl:hover,.p .fsl:focus{color:#06325a;background:#eaf2fb}
+.p .aj{display:block;font-size:.8rem;font-weight:bold;background:#fff7cc;border:2px solid #d4a800;border-radius:.4rem;padding:.15rem .35rem;margin-top:.3rem;color:#5a4500}
+.ajudou{background:#fff7cc;border:3px solid #d4a800;border-radius:.7rem;padding:.6rem .9rem;margin:.6rem 0}
+.ajudou ul{margin:.3rem 0 0 1.1rem;padding:0}
+.note{background:#fff;border-left:6px solid var(--ask);padding:.5rem .8rem;margin:.6rem 0;border-radius:.4rem;font-size:.92rem}
+.story{background:#fff;border:3px dashed var(--ask);border-radius:.8rem;padding:.7rem 1rem;margin:.7rem 0}
+.story h3{color:var(--ask)}
+.check{display:flex;gap:.7rem;align-items:flex-start;background:#fff;border:2px solid var(--line);border-radius:.7rem;padding:.6rem .8rem;margin:.5rem 0}
+.check input{width:2rem;height:2rem;flex:none;margin-top:.2rem}
+.check small{display:block;color:#555}
+dialog{border:4px solid #2d2a26;border-radius:1rem;max-width:40rem;width:94vw;padding:1rem;font-size:1rem}
+dialog::backdrop{background:rgba(0,0,0,.55)}
+dialog h2{margin:0 0 .4rem;font-size:1.3rem;background:none;color:var(--ink);padding:0}
+dialog ul{margin:.2rem 0 .6rem 1.1rem;padding:0}
+label{display:block;font-weight:bold;margin:.7rem 0 .2rem}
+input[type=text],textarea,select{width:100%;font:inherit;font-size:1rem;padding:.6rem;border:2px solid #444;border-radius:.5rem;background:#fff}
+textarea{min-height:7rem}
+.opts{display:flex;flex-direction:column;gap:.4rem}
+.opts label{font-weight:normal;display:flex;gap:.6rem;align-items:center;background:#f3f0ea;border:2px solid var(--line);border-radius:.6rem;padding:.6rem;margin:0}
+.opts input{width:1.6rem;height:1.6rem}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#2d2a26;color:#fff;padding:.6rem .8rem;display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;justify-content:center;z-index:9}
+.bar span{font-weight:bold}
+.mine{background:#fff;border:2px solid var(--line);border-radius:.6rem;padding:.5rem .8rem;margin:.4rem 0}
+.mine button{min-height:2.4rem;padding:.3rem .7rem;font-size:.85rem}
+.small{font-size:.85rem;color:#444}
+.flash{animation:flash 1s ease-in-out 3;outline:6px solid #ffb300!important;outline-offset:3px}
+@keyframes flash{50%{outline-color:#ff3d00}}
+#roda svg{display:block;margin:0 auto}
+#grafo svg{width:100%;height:100%;cursor:grab;font-family:Verdana,Tahoma,Arial,sans-serif}
+#grafo .lnk{fill:none;stroke:#8a7f6c;stroke-width:2.5}
+#grafo .no rect{stroke-width:3;rx:10;ry:10}
+#grafo .no .nome{font-size:14px;font-weight:bold;fill:#1b1b1b}
+#grafo .no .sub{font-size:11.5px;fill:#333}
+#grafo .tg circle{stroke:#2d2a26;stroke-width:2.5;fill:#fff;cursor:pointer}
+#grafo .tg text{font-size:18px;font-weight:bold;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+#grafo .corpo{cursor:pointer}
+#grafo .hl rect{stroke:#ff3d00!important;stroke-width:7!important}
+#roda path{cursor:pointer;stroke:#fff;stroke-width:2}
+#roda path:hover,#roda path:focus{opacity:.8}
+#roda path.hl{stroke:#ffb300;stroke-width:8;animation:hl 1s ease-in-out 4}
+@keyframes hl{50%{stroke:#ff3d00}}
+#roda text{pointer-events:none;font-family:Verdana,Tahoma,Arial,sans-serif}
+@media (max-width:640px){
+  .legend{position:static}
+  .bar{padding:.35rem .5rem;gap:.35rem}
+  .bar span{width:100%;text-align:center;font-size:.8rem}
+  .bar button{flex:1;min-height:2.7rem;padding:.3rem .4rem;font-size:.9rem}
+  body{padding-bottom:8rem}
+  .p{width:100%}
+}
+.aba{display:none}
+.aba.ativa{display:block}
+body{padding-bottom:6rem}
+.navbar{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;background:#2d2a26;border-top:3px solid #d4a800;padding:.25rem .2rem calc(.25rem + env(safe-area-inset-bottom))}
+.navbar button{flex:1;min-width:0;background:none;border:0;border-radius:.6rem;color:#f3ede2;font-size:.72rem;padding:.3rem .1rem;min-height:3.6rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.1rem;position:relative;line-height:1.1}
+.navbar button span{font-size:1.45rem;line-height:1}
+.navbar button[aria-current="page"]{background:#d4a800;color:#1b1b1b;font-weight:bold}
+.badge{position:absolute;top:.15rem;right:18%;background:#d62828;color:#fff;border-radius:1rem;font-size:.7rem;padding:0 .35rem;min-width:1.2rem}
+.atalhos{display:grid;grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr));gap:.6rem;margin:.8rem 0}
+.atalhos button{display:flex;flex-direction:column;align-items:center;gap:.2rem;padding:.8rem .5rem;background:#fff;border:3px solid #2d2a26;font-weight:bold;font-size:1rem}
+.atalhos button span{font-size:2.2rem}
+.atalhos small{font-weight:normal;font-size:.78rem;color:#444;text-align:center}
+.envio{background:#fff;border:3px solid #0b4f8a;border-radius:.8rem;padding:.7rem 1rem;margin:.8rem 0}
+@media (min-width:900px){.navbar button{font-size:.85rem}}
+@media (max-width:640px){
+  main h2{font-size:1.05rem;margin-top:.8rem}
+  .aba[data-aba="arvore"] > p.small{font-size:.78rem;margin:.3rem 0}
+  #grafoBotoes{gap:.3rem;margin:.3rem 0}
+  #grafoBotoes button{min-height:2.3rem;padding:.25rem .55rem;font-size:.8rem}
+  #grafo{height:62vh!important;min-height:20rem!important}
+  .navbar button{font-size:.62rem}
+  .navbar button span{font-size:1.3rem}
+}
+@media print{.legend,.bar,.navbar,.tools,button{display:none!important}body{padding:0}.aba{display:block!important}}
+</style>
+</head>
+<body>
+<section class="aba" data-aba="inicio">
+<header>
+  <h1>🌳 A história da nossa família</h1>
+  <div class="intro">
+    <p style="margin:.2rem 0"><b>Olá!</b> Estamos montando a árvore da nossa família e precisamos da ajuda de vocês. <b>Use os botões da barra lá embaixo</b> para ver a família de jeitos diferentes. Toque no nome de qualquer pessoa para ver o que já sabemos e contar o que você sabe.</p>
+    <p style="margin:.2rem 0"><b>Não precisa saber tudo.</b> Um nome, uma data, uma cidade ou uma lembrança já ajudam muito.</p>
+    <div class="atalhos">
+      <button onclick="mostrarAba('arvore')"><span>🌳</span>Árvore<small>quem é quem, abre e fecha</small></button>
+      <button onclick="mostrarAba('roda')"><span>⭕</span>Roda<small>todos os antepassados num círculo</small></button>
+      <button onclick="mostrarAba('mapa')"><span>🗺️</span>Mapa<small>as cidades da família</small></button>
+      <button onclick="mostrarAba('historias')"><span>📖</span>Histórias<small>o que se conta</small></button>
+      <button onclick="mostrarAba('tarefas')"><span>✅</span>Ajudar<small>documentos que faltam</small></button>
+      <button onclick="mostrarAba('responder')"><span>💬</span>Responder<small>mandar pelo WhatsApp</small></button>
+    </div>
+    <div class="tools">
+      <button onclick="zoom(2)" aria-label="Aumentar a letra">🔍 Letra maior</button>
+      <button onclick="zoom(-2)" aria-label="Diminuir a letra">Letra menor</button>
+      <button onclick="window.print()">🖨️ Imprimir</button>
+    </div>
+  </div>
+</header>
+
+<div style="max-width:62rem;margin:0 auto;padding:0 .8rem"><div class="ajudou" id="ajudou"></div></div>
+
+<div class="legend"><div>
+  <span class="chip ok">✔ VERDE = já temos documento (certidão, registro)</span>
+  <span class="chip ask">? LARANJA = ainda é o que a família conta. Falta confirmar</span>
+</div></div>
+</section>
+
+<main>
+
+<section class="aba" data-aba="arvore">
+<h2 id="arvoreTopo">🌳 Árvore da família</h2>
+<p class="small"><b>＋</b> abre um ramo, <b>－</b> fecha. Toque no <b>nome</b> para ver detalhes. Arraste para andar; use dois dedos ou os botões para aproximar.</p>
+<div class="tools" id="grafoBotoes">
+  <button onclick="grafoZoom(1.3)" aria-label="Aproximar">🔍＋</button>
+  <button onclick="grafoZoom(1/1.3)" aria-label="Afastar">🔍－</button>
+  <button onclick="grafoAbrirTudo()">Abrir tudo</button>
+  <button onclick="grafoCentralizar()">↺ Recolher e voltar</button>
+</div>
+<div id="grafo" style="height:75vh;min-height:24rem;border:3px solid #2d2a26;border-radius:.8rem;background:#fffdf8;overflow:hidden;touch-action:none"></div>
+<div class="legend" style="position:static;border:0;background:none;padding:.4rem 0"><div>
+  <span class="chip ok">✔ com documento</span><span class="chip ask">? falta confirmar</span><span class="chip" style="background:#eee;border:3px dotted #888;color:#555">? ainda não sabemos quem é</span><span class="chip" style="background:#e8eef7;border:3px solid #6b86ad;color:#2c4a73">📁 grupo de irmãos ou primos</span>
+</div></div>
+<p class="small" id="grafoAviso" style="display:none">A árvore interativa precisa de internet para aparecer. Enquanto isso, use a lista abaixo.</p>
+
+<details id="listaArvore" style="margin:.8rem 0"><summary style="font-weight:bold;cursor:pointer;padding:.6rem;background:#efe9dc;border-radius:.6rem">📋 Ver a árvore em lista (todos os quadradinhos, por ramo)</summary>
+<h2>Nossa família hoje</h2>
+<div id="g-nucleo"></div>
+<h2>Lado do pai (Silvano): família Valentina, de Santa Catarina</h2>
+<div id="g-valentina"></div>
+<h2>Lado do pai (Silvano): família Santos e Campos, do Ceará, da Bahia e de São Paulo</h2>
+<div id="g-santos"></div>
+<h2>Lado da mãe (Celiane): família Ramalho e Xavier, da Paraíba</h2>
+<div id="g-ramalho"></div>
+</details>
+</section>
+
+<section class="aba" data-aba="roda">
+<h2>⭕ Roda da família</h2>
+<p class="small">Os netos estão no <b>centro</b>. Cada anel para fora é uma geração mais antiga: pais, avós, bisavós, trisavós. O lado <b>esquerdo</b> é a família do pai (Silvano) e o <b>direito</b>, a da mãe (Celiane). <b>Toque em um pedaço</b> para ver a pessoa. Os pedaços <b>cinza com “?”</b> são pessoas que ainda não sabemos quem são: toque e conte, se souber!</p>
+<div class="tools">
+  <button onclick="zoomRoda(1)">🔍 Ampliar a roda</button>
+  <button onclick="zoomRoda(-1)">Diminuir</button>
+</div>
+<div id="rodaBox" style="overflow:auto;border:3px solid #2d2a26;border-radius:.8rem;background:#fff;text-align:center"><div id="roda"></div></div>
+<div class="legend" style="position:static;border:0;background:none;padding:.4rem 0"><div>
+  <span class="chip ok">✔ com documento</span><span class="chip ask">? falta confirmar</span><span class="chip" style="background:#eee;border:3px dotted #888;color:#555">? ainda não sabemos quem é</span>
+</div></div>
+
+</section>
+
+<section class="aba" data-aba="mapa">
+<h2>🗺️ Mapa: por onde a nossa família passou</h2>
+<p class="small">Cada alfinete é uma cidade que aparece nos documentos ou nas histórias. <b>Toque no alfinete</b> para ver o que aconteceu ali e qual é a prova. As linhas mostram o caminho de cada ramo da família ao longo dos anos.</p>
+<div class="tools" id="filtros">
+  <button onclick="verRamo('todos')" class="main">Todos</button>
+  <button onclick="verRamo('valentina')">🟦 Valentina (SC)</button>
+  <button onclick="verRamo('santos')">🟪 Santos e Campos</button>
+  <button onclick="verRamo('ramalho')">🟫 Ramalho e Xavier</button>
+</div>
+<div id="mapa" style="height:70vh;min-height:22rem;border:3px solid #2d2a26;border-radius:.8rem;background:#e8eef2"></div>
+<p class="small" id="mapaAviso" style="display:none">O mapa precisa de internet para aparecer. Enquanto isso, veja a lista de lugares abaixo.</p>
+<details style="margin:.6rem 0"><summary style="font-weight:bold;cursor:pointer;padding:.5rem 0">📋 Ver a lista de lugares (sem mapa)</summary><div id="listaLugares"></div></details>
+
+</section>
+
+<section class="aba" data-aba="historias">
+<h2>📖 Histórias que a família conta</h2>
+<p class="small">Estas histórias são bonitas, mas ainda <b>não têm documento</b>. Elas ficam em laranja até a gente achar a prova. Se você ouviu alguma delas, conte para nós de quem ouviu.</p>
+<div id="historias"></div>
+
+</section>
+
+<section class="aba" data-aba="tarefas">
+<h2>✅ O que podemos conseguir juntos</h2>
+<p class="small">Marque ✔ o que você <b>já tem em casa</b>. Pode mandar uma foto pelo WhatsApp. Foto de certidão, de RG ou de foto antiga com nome escrito atrás também serve.</p>
+<div id="tarefas"></div>
+
+</section>
+
+<section class="aba" data-aba="responder">
+<h2>💬 Responder e mandar para o Alef</h2>
+<p class="small">Para responder sobre uma pessoa, abra a <b>Árvore</b> ou a <b>Roda</b> e toque no nome dela. Para falar de alguém que não aparece, use o botão abaixo. Quando terminar, toque em <b>Enviar pelo WhatsApp</b>.</p>
+<div class="tools">
+  <button onclick="abrirNovo()" class="main">➕ Contar de um parente que não está aqui</button>
+</div>
+<div class="envio">
+  <p id="cont" style="font-weight:bold;margin:.2rem 0 .5rem">Nenhuma resposta ainda</p>
+  <div class="tools">
+    <button class="main" onclick="enviarZap()">📲 Enviar pelo WhatsApp</button>
+    <button onclick="copiar()">📋 Copiar o texto</button>
+  </div>
+</div>
+<h3 style="margin-top:1rem">Suas respostas guardadas</h3>
+<div id="minhas"></div>
+</section>
+</main>
+
+<nav class="navbar" aria-label="Seções">
+  <button data-ir="inicio"><span>🏠</span>Início</button>
+  <button data-ir="arvore"><span>🌳</span>Árvore</button>
+  <button data-ir="roda"><span>⭕</span>Roda</button>
+  <button data-ir="mapa"><span>🗺️</span>Mapa</button>
+  <button data-ir="historias"><span>📖</span>Histórias</button>
+  <button data-ir="tarefas"><span>✅</span>Ajudar</button>
+  <button data-ir="responder"><span>💬</span>Responder<b id="badge" class="badge" hidden>0</b></button>
+</nav>
+
+<!-- Janela da pessoa -->
+<dialog id="dlgPessoa">
+  <h2 id="pNome"></h2>
+  <p id="pSt" class="small"></p>
+  <b>O que já sabemos:</b><ul id="pSabe"></ul>
+  <b>O que ainda falta:</b><ul id="pFalta"></ul>
+  <p id="pPerg" class="note"></p>
+  <div id="pLinks" class="tools"></div>
+  <form id="fPessoa" onsubmit="return guardarPessoa(event)">
+    <label>Seu nome</label>
+    <input type="text" id="rNome" placeholder="Ex.: Tia Maria" autocomplete="name">
+    <label>O que você quer dizer?</label>
+    <div class="opts">
+      <label><input type="radio" name="rTipo" value="CONFIRMO" checked> ✔ Está certo, eu confirmo</label>
+      <label><input type="radio" name="rTipo" value="CORRIJO"> ✏️ Tem algo errado, eu corrijo</label>
+      <label><input type="radio" name="rTipo" value="ACRESCENTO"> ➕ Eu sei mais coisas sobre essa pessoa</label>
+    </div>
+    <label>Escreva aqui (pode ser curto)</label>
+    <textarea id="rTexto" placeholder="Ex.: Ela nasceu em tal cidade. O apelido dela era..."></textarea>
+    <div class="tools" style="margin-top:.8rem">
+      <button type="submit" class="main">✔ Guardar minha resposta</button>
+      <button type="button" onclick="fechar('dlgPessoa')">Fechar</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Janela novo parente -->
+<dialog id="dlgNovo">
+  <h2>➕ Um parente que não está na árvore</h2>
+  <form onsubmit="return guardarNovo(event)">
+    <label>Seu nome</label>
+    <input type="text" id="nNome" autocomplete="name">
+    <label>Nome da pessoa (como você lembra)</label>
+    <input type="text" id="nPessoa" placeholder="Ex.: Tio Zé, Maria da Silva">
+    <label>Quem é essa pessoa para nós?</label>
+    <select id="nRel">
+      <option>Não sei explicar</option><option>Irmão ou irmã de alguém da família</option><option>Pai ou mãe de alguém da família</option>
+      <option>Avô ou avó de alguém da família</option><option>Tio ou tia</option><option>Primo ou prima</option>
+      <option>Sobrinho ou sobrinha</option><option>Marido ou esposa</option><option>Outro parente</option>
+    </select>
+    <label>De quem ela é parente? (nome)</label>
+    <input type="text" id="nDe" placeholder="Ex.: do vô Hilário">
+    <label>Onde nasceu ou morou? Quando (mais ou menos)?</label>
+    <input type="text" id="nOnde" placeholder="Ex.: Diamante, Paraíba, por volta de 1950">
+    <label>Quem mais sabe dela? Algum telefone?</label>
+    <input type="text" id="nQuem">
+    <div class="tools" style="margin-top:.8rem">
+      <button type="submit" class="main">✔ Guardar</button>
+      <button type="button" onclick="fechar('dlgNovo')">Fechar</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+/* Número do WhatsApp de quem recebe as respostas, com 55 + DDD (ex.: "5511999999999").
+   Se ficar vazio, o WhatsApp abre e a pessoa escolhe o contato. */
+var ZAP = "5519997957925";
+
+/* ===== DADOS ===== */
+// c = confirmado com documento; p = ainda não confirmado
+var P = {
+ silvano:{n:"Silvano Valmor Valentina",d:"Nasceu em 1975, Joinville/SC",s:"c",aj:"Contou a história da família pelo WhatsApp",
+  sabe:["É filho de Valmor e Irani (consta no RG dele).","Casou no civil com Celiane (registro em Alto Paraíso/RO)."],
+  falta:["Certidão de nascimento (data e cartório exatos)."],q:"Você tem a certidão de nascimento do Silvano?"},
+ celiane:{n:"Celiane Ramalho de Souza Valentina",d:"Nasceu em 1974, no Sítio Sabonete, Diamante/PB",s:"c",aj:"Enviou a certidão de nascimento e o RG",
+  sabe:["Certidão de nascimento lida: filha de Hilário Xavier de Souza e Juracy Ramalho de Souza.","Registro feito em 1976 no cartório de Boa Ventura/PB."],
+  falta:["Certidão de casamento com Silvano (inteiro teor)."],q:"Alguém sabe por que o registro só foi feito em 1976?"},
+ alef:{n:"Alef Rayan Souza Valentina",d:"Nasceu em 1994, Ariquemes/RO",s:"c",aj:"Está juntando tudo nesta árvore",sabe:["Certidão de nascimento conferida."],falta:[],q:""},
+ irmaos:{n:"Os quatro netos: Alef, Alyson, Álex e Adrian",d:"Filhos de Silvano e Celiane",s:"c",
+  sabe:["Toque no nome de cada um, logo abaixo da árvore, para ver os detalhes."],falta:[],q:""},
+ alyson:{n:"Alyson Alan Souza Valentina",d:"Nasceu em 1995, Alto Paraíso/RO",s:"p",aj:"Recebeu o caderno da vó Irani",
+  sabe:["Os pais estão certos (aparece no edital do casamento dele, em 2020)."],falta:["Cópia da certidão de nascimento."],q:""},
+ alex:{n:"Álex Silvano Souza Valentina",d:"Nasceu em 1996, Ariquemes/RO",s:"p",
+  sabe:["Provavelmente é ele quem começou a árvore no site FamilySearch em 2023 (usuário “Álex47”)."],falta:["Cópia da certidão de nascimento."],q:"Álex, foi você que começou a árvore no FamilySearch?"},
+ adrian:{n:"Adrian Ryan Souza Valentina",d:"Nasceu em 2001",s:"p",sabe:["Filho de Silvano e Celiane."],falta:["Cópia da certidão de nascimento (confirmar se é “Ryan” ou “Rian”)."],q:""},
+
+ aristides:{n:"Aristides Domingos da Rosa",d:"Natural de Cangueri, Imaruí/SC",s:"c",
+  sabe:["Consta como pai de Manoel Valentina no óbito de 1995."],falta:["Quando nasceu e morreu.","Quem eram os pais dele."],q:"Alguém em SC lembra dele? Ele tinha o apelido “Toda”?"},
+ valentinaines:{n:"Valentina Inês da Conceição",d:"Santa Catarina",s:"c",
+  sabe:["Consta como mãe de Manoel Valentina no óbito de 1995.","Pode ser dela a origem do nosso sobrenome “Valentina”."],falta:["Quando nasceu e morreu.","Quem eram os pais dela."],q:"A família lembra de uma bisavó chamada Valentina? Ela era chamada de Tintina?"},
+ manoel:{n:"Manoel Valentina",d:"12/05/1929 a 11/11/1995. Morou em Cangueri, Imaruí/SC",s:"c",
+  sabe:["Registro de óbito lido: aposentado, casado com Maria Almecinda de Jesus, deixou 10 filhos.","Foi sepultado no cemitério de Cangueri."],
+  falta:["Certidão de nascimento (Imaruí, 1929).","Pelo caderno da vó Irani, o pai dele seria “Antônio Rosa” e a mãe “Constantina”. Isso é diferente do óbito (Aristides e Valentina Inês). Precisamos entender."],
+  q:"Manoel foi criado por outro pai (“pai de criação”)? Quem lembra dessa história?"},
+ almecinda:{n:"Maria Almecinda de Jesus",d:"Esposa de Manoel. A família escreve também “Almesinda”",s:"c",
+  sabe:["O nome está no óbito do marido (1995)."],
+  falta:["O caderno da vó Irani diz que ela ainda está viva, com 98 anos. Precisamos confirmar.","Grafia certa do nome (Almecinda, Almerinda ou Almesinda)."],q:"Ela ainda vive? Em que cidade? Alguém tem um RG ou foto dela?"},
+ valmor:{n:"Valmor Manoel Valentina",d:"Nasceu em 1951, Imaruí/SC",s:"c",
+  sabe:["Documento de 1971 (Diário da Justiça de SC): nasceu em Imaruí, filho de Manoel e Maria.","Casou-se com Irani em 1971 em Florianópolis."],
+  falta:["Certidão de nascimento e de casamento (grafia correta do nome)."],q:"Tem a certidão de casamento de 1971 em casa?"},
+ irmaosvalmor:{n:"Irmãos do Valmor (10 filhos de Manoel e Maria)",d:"Segundo o caderno da vó Irani",s:"p",
+  sabe:["José Rosa, Lorival (falecido), Lorena, Madalena (“Preta”), Helena, Filomena (“Mena”), Bernadete (“Det”), Antônio (“Nica”), Guiomar (morreu bebê) e Joaquim (“Kinca”).","Dá 10 nomes, o mesmo número do óbito de Manoel. É um bom sinal."],
+  falta:["Datas de nascimento e cidades de cada um.","Quem mais tem filhos e netos?"],q:"Falta alguém? Está errado algum nome?"},
+
+ antonio:{n:"Antônio Ignácio dos Santos",d:"Ceará (Brejo dos Santos, hoje Brejo Santo)",s:"c",
+  sabe:["Consta como pai de José no casamento de 1937."],falta:["Datas e quem eram os pais dele."],q:""},
+ joaquina:{n:"Joaquina Maria da Conceição",d:"Brejo dos Santos/CE",s:"c",
+  sabe:["Consta como mãe de José no casamento de 1937."],falta:["Datas e quem eram os pais dela."],q:""},
+ justino:{n:"Justino Campos Bahia",d:"Nasceu em 1872, Bom Jesus das Minas/BA (hoje Brumado)",s:"c",
+  sabe:["Consta como pai de Guiomar no casamento de 1937.","O caderno da vó Irani diz que ele nasceu em Caitité/BA e era “dono do cartório” (a confirmar)."],
+  falta:["Onde nasceu de verdade: Caitité ou Brumado?","Óbito."],q:"Ele foi dono de cartório? Em que cidade?"},
+ balduina:{n:"Balduína Angélica da Silva",d:"Nasceu em 1897, Bom Jesus dos Meiras/BA",s:"c",
+  sabe:["Consta como mãe de Guiomar no casamento de 1937.","Segundo o caderno, ficou viúva e veio com os filhos Guiomar, Paulino e Justino."],
+  falta:["Óbito e data de nascimento exata."],q:"Alguém lembra da bisavó Balduína?"},
+ marcolino:{n:"Manoel Marcolino da Silva e Jesuíne Angélica da Silva",d:"Pais de Balduína (segundo o caderno da vó Irani)",s:"p",
+  sabe:["Filhos: José, Miguel, Elisipero, Balduína, Otacília, Maria e Bernardina.","Conta-se que Manoel morreu atravessando o Rio São Francisco com uma tropa de animais; Jesuíne veio viúva com todos os filhos."],
+  falta:["Nenhum documento ainda. É só o que a família lembra."],q:"Para onde Jesuíne se mudou depois de viúva?"},
+ manoelcampos:{n:"Manoel Ignácio Campos e Maria de Jesus",d:"Pais do Justino. Bom Jesus das Minas/BA (hoje Brumado)",s:"p",
+  sabe:["Segundo perfis feitos por outras pessoas no FamilySearch: Manoel (1851 a 1890) e Maria (1849 a 1890), casados em 1871."],
+  falta:["Ainda não conferimos os documentos desses perfis."],q:"Alguém da Bahia lembra desses nomes?"},
+ joseign:{n:"José Ignácio dos Santos",d:"31/01/1913 a 06/05/1995. Nasceu no Ceará (Brejo Santo ou Crato)",s:"c",
+  sabe:["Certidão de casamento de 1937 lida.","Lavrador. Morreu em 06/05/1995."],falta:["Onde nasceu: Brejo Santo ou Crato? Certidão de nascimento.","Irmãos: o caderno fala em 3 irmãos."],q:"Quem eram os 3 irmãos do José?"},
+ guiomar:{n:"Guiomar Campos dos Santos",d:"08/03/1918 a 20/05/2008. Nasceu em Caitité/BA",s:"c",
+  sabe:["Casou com José em 14/08/1937, em Quintana (Glicério/SP).","Morreu em Alto Paraíso/RO."],falta:["Os irmãos dela: o caderno fala em 3 (Guiomar, Paulino e Justino são os filhos da Balduína)."],q:"A história de que ela tinha ascendência indígena ou francesa é verdade? Quem contou?"},
+ irmaosirani:{n:"Irmãos da Irani (18 filhos de José e Guiomar)",d:"Segundo o caderno da vó Irani",s:"p",
+  sabe:["Anania (1939), Amaniar (1940) e Irandir (1946) morreram bebês em Parnaso/SP. Estes três têm registro.","Os outros, pelo caderno: Débora (72), Natanael (74), Paulo (73), Guiomar (69), Justino e Silas (vivos); José e Samuel (falecidos); Iracema, Ananias e Dagmar (bebê)."],
+  falta:["A lista tem nomes repetidos (3 “Ananias”) e a ordem não está clara.","Datas, cidades e cônjuges."],q:"Alguém sabe a ordem certa dos 18 irmãos?"},
+ irani:{n:"Irani Inácio dos Santos",d:"Nasceu em 1944, Parnaso (distrito de Tupã/SP)",s:"c",
+  sabe:["Documento de 1971: filha de José Inácio dos Santos e de uma Campos dos Santos.","Professora. Foi quem anotou tudo no caderno que ajudou esta árvore."],
+  falta:["Certidão de nascimento (confirmar a data)."],q:""},
+
+ hilario:{n:"Hilário Xavier de Souza",d:"Nasceu em 1943, Diamante/PB",s:"c",
+  sabe:["Certidão de casamento lida (enviada pela tia Lucilene): nasceu em Diamante/PB, filho de Manoel Xavier de Souza e Cândida Maria da Conceição.","Casou com Juracy em 26/01/1969, em Itaporanga/PB.","Morou em Diadema/SP por volta de 1978 e depois em Rondônia."],
+  falta:["Certidão de nascimento dele.","A lista completa dos irmãos."],q:"Quem eram “Cosme e Damião” na família?"},
+ juracy:{n:"Juracy Ramalho de Souza",d:"Nasceu em 1946, Diamante/PB",s:"c",
+  sabe:["Certidão de casamento lida: nasceu em Diamante/PB, filha de Miguel Mariano e Julieta Ramalho.","É o nome que aparece escrito com “y”."],
+  falta:["Certidão de nascimento dela."],q:"A vó Juracy lembra dos avós dela? Como se chamavam?"},
+ manoelxavier:{n:"Manoel Xavier de Souza",d:"Paraíba (Boa Ventura/Diamante)",s:"c",
+  sabe:["Consta como pai do Hilário na certidão da Celiane."],falta:["Data e local de nascimento e de morte.","Quem eram os pais dele. Ainda não sabemos."],q:"Alguém sabe de onde veio a família Xavier?"},
+ candida:{n:"Cândida Maria da Conceição",d:"Paraíba. “Dona Cândida”",s:"c",
+  sabe:["Consta como mãe do Hilário na certidão da Celiane."],falta:["Datas, local e quem eram os pais dela."],q:"A sobrinha Leonice é neta mais velha dela. Quem mais tem foto?"},
+ miguel:{n:"Miguel Mariano",d:"Paraíba. Pai da Juracy",s:"c",
+  sabe:["Consta como pai da Juracy e como declarante do óbito da Julieta (1977)."],falta:["Nome completo, nascimento (por volta de 1907) e morte."],q:"Miguel Mariano tinha outro sobrenome?"},
+ julieta:{n:"Julieta Ramalho de Sousa",d:"10/01/1905 (Bonito de Santa Fé/PB) a 23/02/1977 (Boa Ventura/PB)",s:"c",
+  sabe:["Registro de óbito lido: filha de Manoel José de Souza e Virgulina Ramalho de Sousa.","Filhos: Expedito, José Mariano, Juracy e Severino."],falta:["Certidão de batismo (1905).","Estado civil (era “companheira” de Miguel?)."],q:"Os irmãos da vó Juracy ainda têm descendentes? Onde moram?"},
+ manoeljose:{n:"Manoel José de Souza",d:"Paraíba",s:"c",
+  sabe:["Pai da Julieta (óbito dela, 1977). Casou com Virgulina por volta de 1907, em Conceição/PB."],falta:["Nascimento, morte e pais."],q:""},
+ virgulina:{n:"Virgulina Ramalho de Sousa",d:"1872 a 1958 (segundo árvore pública)",s:"c",
+  sabe:["Mãe da Julieta (óbito dela, 1977)."],falta:["Os documentos dela (óbito de 1958).","Os 6 filhos: José (1896), Julieta (1905), João (1916)…"],q:""},
+ eduardo:{n:"Eduardo Alexandre Pinto Ramalho e Casimira Maria da Conceição",d:"Pais de Virgulina (segundo árvores públicas na internet)",s:"p",
+  sabe:["Eduardo: 1833 a 1892. Daí a linha sobe até o Capitão José Pinto Ramalho (1713-1782)."],
+  falta:["Nenhum documento confirmou esses elos. É só uma árvore feita por outras pessoas.","Algumas datas das gerações antigas não batem."],q:"Alguém na família ouviu falar de “Pinto Ramalho”?"},
+ irmaosjuracy:{n:"Irmãos da Juracy",d:"Filhos de Miguel e Julieta",s:"c",
+  sabe:["Expedito, José Mariano e Severino (aparecem no óbito da mãe, 1977)."],falta:["Onde moraram e se têm filhos e netos."],q:"Algum deles ainda vive? Tem telefone de algum primo?"},
+ irmaoshilario:{n:"Irmãos do Hilário",d:"Segundo conversas da família",s:"p",
+  sabe:["Assis Xavier, “Tota” (falecido em 14/01/2026), Naldo (“Naldinho”), Diassis. Talvez Laura (falecida em 2026)."],falta:["Lista completa e datas."],q:"Quantos irmãos o vô Hilário teve? Quais os nomes?"},
+ filhoshilario:{n:"Outros filhos de Hilário e Juracy",d:"Irmãos da Celiane",s:"p",
+  sabe:["Lucilene, Maria Neide, Célio, Cícero e Selma (segundo a família)."],falta:["Datas de nascimento e cidades."],q:"Faltou algum irmão ou irmã da Celiane?"}
+};
+
+/* ===== TIOS, TIAS E PARENTES (um quadradinho para cada) ===== */
+function T(n,d,s,sabe,falta,q,aj){ return {n:n,d:d,s:s,sabe:sabe,falta:falta||["Data e cidade de nascimento.","Com quem casou e os nomes dos filhos."],q:q||"Você conhece? Conte o que sabe!",aj:aj}; }
+var cad="Nome escrito no caderno da vó Irani.";
+Object.assign(P,{
+ // irmãos do Silvano
+ paulo:T("Paulo Valmor Valentina","Irmão do Silvano","p",["Casado com Rosane Souza. Filhos: Ian Paulo e Luan Paulo."]),
+ eliane:T("Eliane Valentina de Carvalho","Irmã do Silvano","p",["Casada com Altair Carvalho. Filhos: Anne Kelly, Altair, Lucas e Luan."]),
+ jackson:T("Jackson Valmor Valentina","Irmão do Silvano","p",["Filhos: Gabriela, Rafaela, Abner e Vitória."]),
+ valmorbebe:T("Valmor Valentina (bebê)","Irmão do Silvano","c",["Nasceu e faleceu em 25/05/1977, em Santa Catarina. Há registro."],["Nada mais a buscar."],"A família lembra dele?"),
+ vania:T("Vânia Valentina","Meia-irmã do Silvano","p",["Filha do segundo casamento do vô Valmor."]),
+ // irmãos da Celiane
+ selma:T("Selma Ramalho de Souza","Irmã da Celiane","p",["Filha de Hilário e Juracy, segundo a família."],null,"Tia Selma, em que cidade você nasceu?"),
+ lucilene:T("Lucilene Ramalho de Souza","Irmã da Celiane. Mora em Alto Paraíso/RO","p",["Filha de Hilário e Juracy.","Conseguiu a certidão de casamento dos pais, que confirmou as datas e a cidade dos avós."],["A certidão de nascimento dela (cidade e data)."],"Tia Lucilene, você nasceu em São Paulo?","Enviou a certidão de casamento do vô Hilário e da vó Juracy"),
+ neide:T("Maria Neide Ramalho de Souza","Irmã da Celiane. Nasceu em 1978, São Bernardo do Campo/SP","c",["Certidão de nascimento lida: filha de Hilário e Juracy, que moravam em Diadema/SP.","Traz os quatro avós: Julieta Ramalho, Miguel Mariano, Cândida Maria da Conceição e Manoel Xavier de Souza."],["Nada urgente. Obrigado!"],"","Enviou a foto da certidão de nascimento dela"),
+ celio:T("Célio Ramalho de Souza","Irmão da Celiane","p",["Filho de Hilário e Juracy, segundo a família."],null,"Tio Célio, em que cidade você nasceu?"),
+ cicero:T("Cícero Ramalho de Souza","Irmão da Celiane","p",["Filho de Hilário e Juracy. Nasceu em Boa Ventura/PB e lembra de lá desde os 3 anos (segundo o grupo da família)."],null,"Tio Cícero, o que você lembra de Boa Ventura?"),
+ // irmãos do Valmor (caderno da vó Irani)
+ v_jose:T("José Rosa","Irmão do vô Valmor","p",[cad,"Repare: usa “Rosa”, o sobrenome do avô Aristides."]),
+ v_lorival:T("Lorival","Irmão do vô Valmor (falecido)","p",[cad,"Já faleceu."]),
+ v_lorena:T("Lorena","Irmã do vô Valmor","p",[cad]),
+ v_madalena:T("Madalena (“Preta”)","Irmã do vô Valmor","p",[cad,"Pode ser a Madalena Valentina de Joinville."]),
+ v_helena:T("Helena","Irmã do vô Valmor","p",[cad]),
+ v_filomena:T("Filomena (“Mena”)","Irmã do vô Valmor","p",[cad]),
+ v_bernadete:T("Bernadete (“Det”)","Irmã do vô Valmor","p",[cad,"Pode ser a “tia Det”, Bernadete Valentina de Oliveira."]),
+ v_antonio:T("Antônio (“Nica”)","Irmão do vô Valmor","p",[cad]),
+ v_guiomar:T("Guiomar","Irmã do vô Valmor (morreu bebê)","p",[cad,"Morreu ainda bebê."],["Nada mais a buscar, só confirmar."]),
+ v_joaquim:T("Joaquim (“Kinca”)","Irmão do vô Valmor","p",[cad]),
+ // irmãos da Irani
+ s_anania:T("Anania","Irmã ou irmão da vó Irani (1939, bebê)","c",["Morreu bebê em 1939, em Parnaso/SP. Há registro.","No caderno talvez apareça como “Ananias”."],["Nada mais a buscar."],""),
+ s_amaniar:T("Amaniar","Irmã ou irmão da vó Irani (1940 a 1941)","c",["Morreu bebê, em Parnaso/SP. Há registro.","No caderno talvez apareça como “Aramira”."],["Nada mais a buscar."],""),
+ s_irandir:T("Irandir","Irmão da vó Irani (1946, bebê)","c",["Morreu bebê em 1946, em Parnaso/SP. Há registro."],["Nada mais a buscar."],""),
+ s_francina:T("Francina (?)","Irmã da vó Irani","p",[cad+" A letra está difícil de ler.","O caderno indica que já faleceu."],["Confirmar o nome."],"Qual era o nome certo dela?"),
+ s_jaci:T("Jaci","Irmã ou irmão da vó Irani","p",[cad,"O caderno indica que faleceu criança."],["Confirmar."],""),
+ s_orandi:T("Orandi","Irmão da vó Irani","p",[cad,"O caderno indica que faleceu jovem, com 18 anos."],["Confirmar."],""),
+ s_ananias:T("Ananias","Irmão da vó Irani","p",["Esposa: Adelina.","No caderno o nome “Ananias” aparece três vezes: pode ser que os pais tenham repetido o nome depois de perder dois bebês."]),
+ s_natanael:T("Natanael","Irmão da vó Irani (vivo)","p",[cad+" Tem cerca de 74 anos."]),
+ s_paulo:T("Paulo","Irmão da vó Irani (vivo)","p",[cad+" Tem cerca de 73 anos."]),
+ s_debora:T("Débora","Irmã da vó Irani (viva)","p",[cad+" Tem cerca de 72 anos."]),
+ s_jose:T("José","Irmão da vó Irani (falecido)","p",[cad,"Esposa: Luiza."]),
+ s_guiomar:T("Guiomar Inácio Dalagnolly Valentina","Irmã da vó Irani (viva)","p",[cad+" Tem cerca de 69 anos.","Casou com um irmão do vô Valmor. Por isso tem o sobrenome Valentina."],["Com qual irmão do Valmor ela casou?"],"Tia Guiomar, com qual irmão do Valmor a senhora casou?"),
+ s_dagmar:T("Dagmar","Irmã da vó Irani (morreu bebê)","p",[cad,"Morreu ainda bebê."],["Confirmar."],""),
+ s_justino:T("Justino","Irmão da vó Irani (vivo)","p",[cad,"Tem o nome do avô, Justino Campos Bahia."]),
+ s_silas:T("Silas","Irmão da vó Irani (vivo)","p",[cad]),
+ s_samuel:T("Samuel","Irmão da vó Irani (falecido)","p",[cad]),
+ s_iracema:T("Iracema","Irmã da vó Irani","p",["Aparece num documento de herdeiros, mas não no caderno."],["Confirmar se é irmã."],"Iracema é irmã da vó Irani?"),
+ // irmãos do Hilário
+ h_assis:T("Assis Xavier (“Tota”)","Irmão do vô Hilário (falecido em 14/01/2026)","p",["Pai da Idelvânia. Informação do grupo da família."]),
+ h_naldo:T("Naldo (“Naldinho”)","Irmão do vô Hilário","p",["Pai da Adriana. Informação do grupo da família."]),
+ h_diassis:T("Diassis","Irmão do vô Hilário (vivo)","p",["Informação do grupo da família."]),
+ h_laura:T("Laura (?)","Talvez irmã do vô Hilário (faleceu em 06/2026)","p",["A prima Nena diz ser filha de Laura. Ainda não está claro se Laura era irmã do vô Hilário."],["Confirmar se era irmã."],"Laura era irmã do vô Hilário?"),
+ // irmãos da Juracy
+ j_expedito:T("Expedito","Irmão da vó Juracy","c",["Aparece como filho no óbito da mãe, Julieta (1977).","Casou com Maria. Uma filha mora no Mato Grosso do Sul."]),
+ j_josemariano:T("José Mariano","Irmão da vó Juracy","c",["Aparece como filho no óbito da mãe, Julieta (1977)."]),
+ j_severino:T("Severino","Irmão da vó Juracy","c",["Aparece como filho no óbito da mãe, Julieta (1977)."])
+});
+P.irani.aj="Escreveu o caderno com os nomes da família";
+
+// Montagem: cada grupo é uma lista de "linhas"; cada linha é uma lista de casais (arrays de ids)
+var G = {
+ nucleo:[["Pais",[["silvano","celiane"]]],["Os quatro netos",[["alef"],["alyson"],["alex"],["adrian"]]],
+  ["Tios e tias por parte do pai (irmãos do Silvano)",[["paulo"],["eliane"],["jackson"],["valmorbebe"],["vania"]]],
+  ["Tios e tias por parte da mãe (irmãos da Celiane)",[["selma"],["lucilene"],["neide"],["celio"],["cicero"]]]],
+ valentina:[["Trisavós (pais do Manoel)",[["aristides","valentinaines"]]],["Bisavós (pais do Valmor)",[["manoel","almecinda"]]],["Avô e avó",[["valmor","irani"]]],
+  ["Irmãos do vô Valmor (os 10 filhos de Manoel e Maria)",[["v_jose"],["v_lorival"],["v_lorena"],["v_madalena"],["v_helena"],["v_filomena"],["v_bernadete"],["v_antonio"],["v_guiomar"],["v_joaquim"]]]],
+ santos:[["Quartos-avós (pais do Justino e da Balduína)",[["manoelcampos"],["marcolino"]]],["Trisavós",[["antonio","joaquina"],["justino","balduina"]]],["Bisavós (pais da Irani)",[["joseign","guiomar"]]],["Avó",[["irani"]]],
+  ["Irmãos da vó Irani (o caderno fala em 18 filhos)",[["s_anania"],["s_amaniar"],["s_francina"],["s_jaci"],["s_irandir"],["s_orandi"],["s_ananias"],["s_natanael"],["s_paulo"],["s_debora"],["s_jose"],["s_guiomar"],["s_dagmar"],["s_justino"],["s_silas"],["s_samuel"],["s_iracema"]]]],
+ ramalho:[["Origem mais antiga (a confirmar)",[["eduardo"]]],["Trisavós",[["manoeljose","virgulina"]]],["Bisavós",[["manoelxavier","candida"],["miguel","julieta"]]],["Avô e avó",[["hilario","juracy"]]],
+  ["Irmãos do vô Hilário",[["h_assis"],["h_naldo"],["h_diassis"],["h_laura"]]],
+  ["Irmãos da vó Juracy",[["j_expedito"],["j_josemariano"],["j_severino"]]]]
+};
+
+var HIST = [
+ {t:"🎸 Parentesco com a cantora Elba Ramalho e o cantor Zé Ramalho",x:"Elba nasceu em Conceição (PB), a mesma cidade onde, em 1907, casaram os bisavós Manoel José e Virgulina Ramalho. Em entrevistas, Elba e o compositor Luiz Ramalho dizem ser “do mesmo Ramalho”. Ainda não sabemos se há ligação com a nossa família.",q:"Alguém ouviu a família falar disso? De quem?"},
+ {t:"🇧🇷 Primo do presidente Lula",x:"Conta-se que um primo do Lula, chamado João Inácio da Silva, casou com a Nena, sobrinha do vô Hilário. Se for verdade, seria parentesco por casamento, e não de sangue. Falta o nome completo da Nena e do marido dela.",q:"Qual o nome inteiro da Nena? Onde ela mora? Quem é a mãe dela?"},
+ {t:"🤠 Lampião e as brigas de terra",x:"A família lembra de disputas de terra do nosso povo contra o bando de Lampião. É uma lembrança antiga, sem documento por enquanto.",q:"Quem contou essa história? O que foi dito?"},
+ {t:"👑 Descendência de nobres franceses",x:"Há quem diga que a família do José Ignácio viria da nobreza francesa. Os documentos que achamos mostram lavradores do Ceará e da Bahia, e nada ligando a isso. Só entra na árvore se aparecer prova.",q:"Quem contou? Havia algum documento ou objeto antigo?"},
+ {t:"🔤 De onde vem o sobrenome “Valentina”",x:"A tradição diz que o sobrenome veio do nome de uma bisavó. O óbito do Manoel mostra que a mãe dele se chamava Valentina Inês e que o pai era “da Rosa”. Isso dá força à tradição.",q:"Alguém sabe por que a família deixou de usar “Rosa”?"}
+];
+
+var TAREFAS = [
+ ["Certidão de nascimento do vô Hilário e da vó Juracy","Ela traz o nome completo dos pais e avós. É a chave para voltar mais uma geração."],
+ ["Certidão de casamento do vô Valmor e da vó Irani (1971) e de nascimento do vô Valmor","Foram feitas em Florianópolis. Servem para acertar a grafia dos nomes."],
+ ["Saber se a bisavó Maria Almecinda ainda vive, onde mora e o nome certo","Se tiver RG ou foto, melhor ainda."],
+ ["Nome, data de nascimento e cidade dos 10 irmãos do vô Valmor","Já temos os nomes pelo caderno da vó Irani. Faltam datas, cidades e filhos."],
+ ["Nome e data de nascimento dos irmãos da vó Irani","São 18 filhos. Precisamos da ordem certa."],
+ ["Nome completo da Nena e telefone de quem conheça","Para esclarecer a história do primo do Lula."],
+ ["Fotos antigas com nome escrito atrás","Qualquer foto de avós, bisavós, casamentos, sítios, igrejas."],
+ ["Gravar um áudio contando o que lembra","Pode ser de 1 minuto. Fale os nomes, os apelidos e as cidades."]
+];
+
+/* ===== ESTADO ===== */
+var S = {respostas:[], novos:[], feito:{}, nome:""};
+try{ var sv=localStorage.getItem("arvoreValentina_v1"); if(sv) S=JSON.parse(sv); }catch(e){}
+function salvar(){ try{localStorage.setItem("arvoreValentina_v1",JSON.stringify(S));}catch(e){} }
+
+/* ===== DESENHO ===== */
+function card(id){
+  var p=P[id], ok=p.s==="c";
+  return '<button class="p '+(ok?'ok':'ask')+'" data-id="'+id+'" onclick="abrir(\''+id+'\')">'
+   +'<span class="nm">'+p.n+'</span>'
+   +(FS[id]?FS[id].map(function(f){return '<span class="fsl" role="link" tabindex="0" onclick="event.stopPropagation();abrirFS(\''+f[0]+'\')" onkeydown="if(event.key===\'Enter\'){event.stopPropagation();abrirFS(\''+f[0]+'\')}">🌐 '+(FS[id].length>1?f[1].replace(/^Ver o /,"Página do ").replace(/^Ver a /,"Página da "):"Página pública")+' no FamilySearch</span>';}).join(""):'')
+   +'<span class="dt">'+p.d+'</span>'
+   +'<span class="st">'+(ok?'✔ Confirmado com documento':'? Ainda não confirmado')+'</span>'
+   +(p.aj?'<span class="aj">🏅 '+p.aj+'</span>':'')
+   +'<span class="tap">👆 Toque aqui</span></button>';
+}
+function montar(){
+  Object.keys(G).forEach(function(k){
+    var h="";
+    G[k].forEach(function(lin,i){
+      if(i>0) h+='<div class="down">▼</div>';
+      h+='<div class="gen"><div class="lab">'+lin[0]+'</div><div class="row">';
+      lin[1].forEach(function(c){
+        h+='<div class="couple">';
+        c.forEach(function(id,j){ if(j>0) h+='<span class="amp">&amp;</span>'; h+=card(id); });
+        h+='</div>';
+      });
+      h+='</div></div>';
+    });
+    document.getElementById("g-"+k).innerHTML=h;
+  });
+  var aj=Object.keys(P).filter(function(k){return P[k].aj;});
+  document.getElementById("ajudou").innerHTML='<b>🏅 Quem já ajudou a montar esta árvore (obrigado!):</b><ul>'
+    +aj.map(function(k){var AP={silvano:"Pai Silvano",celiane:"Mãe Celiane",alef:"Alef",alyson:"Alyson",irani:"Vó Irani",lucilene:"Tia Lucilene",neide:"Tia Neide"};return '<li><a href="#" onclick="abrir(\''+k+'\');return false"><b>'+(AP[k]||CURTO[k]||P[k].n)+'</b></a>: '+P[k].aj+'</li>';}).join("")
+    +'</ul><p style="margin:.4rem 0 0">Você também pode entrar nesta lista: mande uma foto de certidão, RG, foto antiga, ou conte uma lembrança.</p>';
+  document.getElementById("historias").innerHTML=HIST.map(function(h,i){
+    return '<div class="story"><h3>'+h.t+'</h3><p>'+h.x+'</p><p><b>Pergunta:</b> '+h.q+'</p>'
+     +'<button onclick="abrirHist('+i+')">✏️ Eu sei algo sobre isso</button></div>';
+  }).join("");
+  document.getElementById("tarefas").innerHTML=TAREFAS.map(function(t,i){
+    return '<label class="check" style="font-weight:normal"><input type="checkbox" '+(S.feito[i]?'checked':'')+' onchange="marcar('+i+',this.checked)">'
+     +'<span><b>'+t[0]+'</b><small>'+t[1]+'</small></span></label>';
+  }).join("");
+  lista();
+}
+function marcar(i,v){ S.feito[i]=v; salvar(); lista(); }
+
+/* ===== JANELAS ===== */
+var atual=null;
+function li(a){ return a.length? a.map(function(x){return "<li>"+x+"</li>";}).join(""):"<li>Nada por enquanto.</li>"; }
+function abrir(id){
+  var p=P[id]; atual={tipo:"pessoa",id:id,rot:p.n};
+  document.getElementById("pNome").textContent=p.n;
+  document.getElementById("pSt").innerHTML=(p.s==="c"?'<span class="chip ok">✔ Confirmado com documento</span>':'<span class="chip ask">? Ainda não confirmado</span>')+(p.aj?' <span class="chip" style="background:#fff7cc;border:3px solid #d4a800;color:#5a4500">🏅 '+p.aj+'</span>':'');
+  document.getElementById("pSabe").innerHTML=li(p.sabe);
+  document.getElementById("pFalta").innerHTML=li(p.falta);
+  var q=document.getElementById("pPerg"); q.style.display=p.q?"block":"none"; q.innerHTML="<b>Pergunta:</b> "+p.q;
+  var lk='<button type="button" onclick="verNaArvore(\''+id+'\')">🌳 Ver na árvore</button>';
+  if(RODA_IDS[id]) lk+='<button type="button" onclick="verNaRoda(\''+id+'\')">⭕ Ver na roda</button>';
+  if(LP[id]) lk+='<button type="button" onclick="verNoMapa(\''+id+'\')">🗺️ Ver no mapa</button>';
+  (FS[id]||[]).forEach(function(f){ lk+='<a class="btn" style="text-decoration:none;display:inline-block" target="_blank" rel="noopener" onclick="return avisoExterno()" href="https://ancestors.familysearch.org/pt/'+f[0]+'">🌐 '+f[1]+'</a>'; });
+  if(FS[id]) lk+='<p class="small" style="width:100%;margin:.2rem 0 0">O FamilySearch é um site gratuito de árvores. '+(FSNOTA[id]||'A página abre em outra aba.')+'</p>';
+  document.getElementById("pLinks").innerHTML=lk;
+  document.getElementById("rNome").value=S.nome||"";
+  document.getElementById("rTexto").value="";
+  document.getElementById("dlgPessoa").showModal();
+}
+function abrirDesconhecido(rot){
+  atual={tipo:"desconhecido",rot:rot};
+  document.getElementById("pNome").textContent=rot;
+  document.getElementById("pSt").innerHTML='<span class="chip" style="background:#eee;border:3px dotted #888;color:#555">? Ainda não sabemos quem é</span>';
+  document.getElementById("pSabe").innerHTML="<li>Ainda nada. Esta pessoa existiu, mas não temos o nome.</li>";
+  document.getElementById("pFalta").innerHTML="<li>O nome, de onde era e, se possível, quando nasceu ou morreu.</li>";
+  var q=document.getElementById("pPerg"); q.style.display="block"; q.innerHTML="<b>Pergunta:</b> Você lembra o nome? Ouviu alguém falar?";
+  document.getElementById("pLinks").innerHTML="";
+  document.getElementById("rNome").value=S.nome||"";
+  document.getElementById("rTexto").value="";
+  document.querySelector('input[name=rTipo][value=ACRESCENTO]').checked=true;
+  document.getElementById("dlgPessoa").showModal();
+}
+/* ===== LIGAÇÕES ENTRE AS VISTAS ===== */
+var ABA_JA={};
+function mostrarAba(n){
+  var secs=document.querySelectorAll(".aba"), achou=false;
+  secs.forEach(function(s){ var on=s.getAttribute("data-aba")===n; s.classList.toggle("ativa",on); if(on) achou=true; });
+  if(!achou){ n="inicio"; document.querySelector('.aba[data-aba="inicio"]').classList.add("ativa"); }
+  document.querySelectorAll(".navbar button").forEach(function(b){ if(b.getAttribute("data-ir")===n) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current"); });
+  try{ localStorage.setItem("arvoreValentina_aba",n); }catch(e){}
+  if(location.hash!=="#"+n){ try{ history.replaceState(null,"","#"+n); }catch(e){} }
+  window.scrollTo(0,0);
+  if(n==="arvore" && !ABA_JA.arvore && window.grafoCentralizar){ ABA_JA.arvore=1; setTimeout(window.grafoCentralizar,60); }
+  if(n==="mapa" && typeof mapa!=="undefined" && mapa){ setTimeout(function(){ mapa.invalidateSize(); if(!ABA_JA.mapa){ ABA_JA.mapa=1; verRamo("todos"); } },80); }
+}
+function ir(id){
+  var e=document.getElementById(id); if(!e) return;
+  var s=e.closest(".aba"); if(s && !s.classList.contains("ativa")) mostrarAba(s.getAttribute("data-aba"));
+  setTimeout(function(){ e.scrollIntoView({behavior:"smooth",block:"start"}); },90);
+}
+function verNaArvore(id){
+  fechar("dlgPessoa");
+  if(window.grafoFocar && grafoFocar(id)) return;
+  document.getElementById("listaArvore").open=true;
+  var b=document.querySelector('.p[data-id="'+id+'"]'); if(!b) return;
+  b.scrollIntoView({behavior:"smooth",block:"center"});
+  b.classList.remove("flash"); void b.offsetWidth; b.classList.add("flash");
+  setTimeout(function(){b.classList.remove("flash");},3200);
+}
+function verNaRoda(id){
+  fechar("dlgPessoa");
+  ir("roda");
+  document.querySelectorAll('#roda path[data-id="'+id+'"]').forEach(function(p){
+    p.classList.remove("hl"); void p.getBoundingClientRect(); p.classList.add("hl");
+    setTimeout(function(){p.classList.remove("hl");},4200);
+  });
+}
+function verNoMapa(id){
+  fechar("dlgPessoa");
+  ir("mapa");
+  var ls=LP[id]||[];
+  if(!mapa){ ir("listaLugares"); return; }
+  verRamo("todos");
+  var pts=ls.map(function(i){return [LUG[i][1],LUG[i][2]];});
+  setTimeout(function(){
+    if(pts.length===1) mapa.setView(pts[0],8); else mapa.fitBounds(pts,{padding:[40,40],maxZoom:8});
+    if(MARC[ls[0]]) MARC[ls[0]].openPopup();
+  },400);
+}
+
+/* ===== RODA DA FAMÍLIA (gráfico em leque) ===== */
+// anel 1..4: uma pessoa por pedaço; anel 5: o casal de pais de cada pessoa do anel 4.
+// null = ainda não sabemos quem é
+var ANEIS = [
+ ["silvano","celiane"],
+ ["valmor","irani","hilario","juracy"],
+ ["manoel","almecinda","joseign","guiomar","manoelxavier","candida","miguel","julieta"],
+ ["aristides","valentinaines",null,null,"antonio","joaquina","justino","balduina",null,null,null,null,null,null,"manoeljose","virgulina"],
+ [null,null,null,null,null,null,"manoelcampos","marcolino",null,null,null,null,null,null,null,"eduardo"]
+];
+var CURTO = {silvano:"Silvano",celiane:"Celiane",valmor:"Valmor",irani:"Irani",hilario:"Hilário",juracy:"Juracy",
+ manoel:"Manoel Valentina",almecinda:"Maria Almecinda",joseign:"José Ignácio",guiomar:"Guiomar Campos",manoelxavier:"Manoel Xavier",candida:"Cândida Maria",miguel:"Miguel Mariano",julieta:"Julieta Ramalho",
+ aristides:"Aristides",valentinaines:"Valentina Inês",antonio:"Antônio Ignácio",joaquina:"Joaquina",justino:"Justino Campos",balduina:"Balduína",manoeljose:"Manoel José",virgulina:"Virgulina",
+ manoelcampos:"Manoel e Maria",marcolino:"Marcolino e Jesuíne",eduardo:"Eduardo e Casimira"};
+var RODA_IDS = {};
+var rodaEsc=1;
+function polar(r,a){ var t=a*Math.PI/180; return [r*Math.sin(t),-r*Math.cos(t)]; }
+function setor(r1,r2,a1,a2){
+  var g=(a2-a1)>180?1:0, p1=polar(r2,a1), p2=polar(r2,a2), p3=polar(r1,a2), p4=polar(r1,a1);
+  return "M"+p1+"A"+r2+","+r2+" 0 "+g+" 1 "+p2+"L"+p3+"A"+r1+","+r1+" 0 "+g+" 0 "+p4+"Z";
+}
+function quemDesconhecido(n,i){
+  // descobre de quem é pai/mãe o pedaço vazio
+  var filho=ANEIS[n-2]?ANEIS[n-2][Math.floor(i/2)]:null;
+  if(n===5){ filho=ANEIS[3][i]; return filho?"Pais de "+P[filho].n:"Antepassados (ainda não sabemos)"; }
+  if(!filho) return "Antepassado (ainda não sabemos)";
+  return (i%2===0?"Pai de ":"Mãe de ")+P[filho].n;
+}
+function desenharRoda(){
+  var R=[0,72,148,224,300,380,460], FS=[0,22,19,15,13,12];
+  var h='<svg viewBox="-470 -470 940 940" width="100%" style="max-width:'+Math.round(900*rodaEsc)+'px;min-width:'+Math.round(560*rodaEsc)+'px" role="img" aria-label="Roda da família">';
+  for(var n=1;n<=5;n++){
+    var lista=ANEIS[n-1], qtd=(n===5)?16:Math.pow(2,n), span=360/qtd;
+    for(var i=0;i<qtd;i++){
+      var id=lista[i], a1=180+i*span, a2=a1+span, mid=a1+span/2;
+      if(n>=5 && !ANEIS[3][i]) {/* sem filho conhecido: pedaço vazio claro */}
+      var cor,borda,txt,acao;
+      if(id){ var p=P[id]; cor=p.s==="c"?"#4caf50":"#ffb04a"; txt=CURTO[id]||p.n; acao="abrir('"+id+"')"; RODA_IDS[id]=1; }
+      else { cor=(n>=4 && n===4 ? (ANEIS[2][Math.floor(i/2)]?"#d9d9d9":"#efefef") : (ANEIS[3][i]?"#d9d9d9":"#efefef")); txt="?"; acao="abrirDesconhecido('"+quemDesconhecido(n,i).replace(/'/g,"\\'")+"')"; }
+      h+='<path d="'+setor(R[n],R[n+1]-2,a1,a2)+'" fill="'+cor+'" '+(id?'data-id="'+id+'"':'')+' tabindex="0" onclick="'+acao+'" onkeydown="if(event.key===\'Enter\')'+acao.replace(/"/g,'&quot;')+'"><title>'+(id?P[id].n:quemDesconhecido(n,i))+'</title></path>';
+      // texto
+      var rm=(R[n]+R[n+1])/2, pt=polar(rm,mid), rot, fs=FS[n];
+      var m=((mid%360)+360)%360;
+      if(n<=3){ rot=m; if(m>90&&m<270) rot+=180; }
+      else { rot=m-90; if(m>180) rot+=180; }
+      var linhas=[txt];
+      if(txt.indexOf(" e ")>0) linhas=[txt.split(" e ")[0]+" e",txt.split(" e ")[1]];
+      else if(txt.indexOf(" ")>0) linhas=[txt.slice(0,txt.indexOf(" ")),txt.slice(txt.indexOf(" ")+1)];
+      if(txt==="?") { linhas=["?"]; fs=FS[n]+6; }
+      h+='<text transform="translate('+pt[0].toFixed(1)+','+pt[1].toFixed(1)+') rotate('+rot.toFixed(1)+')" text-anchor="middle" font-size="'+fs+'" font-weight="bold" fill="#1b1b1b">';
+      linhas.forEach(function(l,k){ h+='<tspan x="0" dy="'+(k===0?(-(linhas.length-1)*fs*0.55+fs*0.35):fs*1.1)+'">'+l+'</tspan>'; });
+      h+='</text>';
+    }
+  }
+  // centro
+  h+='<circle r="70" fill="#2d2a26" style="cursor:pointer" onclick="abrir(\'irmaos\')"><title>Os netos</title></circle>';
+  h+='<text text-anchor="middle" fill="#fff" font-size="14" font-weight="bold" style="pointer-events:none"><tspan x="0" dy="-14">Alef, Alyson,</tspan><tspan x="0" dy="18">Álex e Adrian</tspan><tspan x="0" dy="20" font-size="11" font-weight="normal">(os netos)</tspan></text>';
+  // rótulos dos lados
+  h+='<text x="-460" y="-440" font-size="18" font-weight="bold" fill="#1f5fbf">◀ Família do pai</text>';
+  h+='<text x="460" y="-440" text-anchor="end" font-size="18" font-weight="bold" fill="#8a5a2b">Família da mãe ▶</text>';
+  h+='<line x1="0" y1="-462" x2="0" y2="462" stroke="#2d2a26" stroke-width="3" stroke-dasharray="6 6" style="pointer-events:none"/>';
+  h+='</svg>';
+  document.getElementById("roda").innerHTML=h;
+}
+function zoomRoda(d){ rodaEsc=Math.max(.6,Math.min(2.4,rodaEsc+d*.3)); desenharRoda(); }
+function abrirHist(i){
+  var h=HIST[i]; atual={tipo:"historia",rot:h.t};
+  document.getElementById("pNome").textContent=h.t;
+  document.getElementById("pSt").innerHTML='<span class="chip ask">? Ainda sem prova</span>';
+  document.getElementById("pSabe").innerHTML="<li>"+h.x+"</li>";
+  document.getElementById("pFalta").innerHTML="<li>Qualquer detalhe: nomes, cidades, quem contou.</li>";
+  var q=document.getElementById("pPerg"); q.style.display="block"; q.innerHTML="<b>Pergunta:</b> "+h.q;
+  document.getElementById("pLinks").innerHTML="";
+  document.getElementById("rNome").value=S.nome||"";
+  document.getElementById("rTexto").value="";
+  document.getElementById("dlgPessoa").showModal();
+}
+function abrirNovo(){ document.getElementById("nNome").value=S.nome||""; document.getElementById("dlgNovo").showModal(); }
+function fechar(id){ document.getElementById(id).close(); }
+
+function guardarPessoa(e){
+  e.preventDefault();
+  var txt=document.getElementById("rTexto").value.trim();
+  var tipo=document.querySelector('input[name=rTipo]:checked').value;
+  var nome=document.getElementById("rNome").value.trim();
+  if(!nome){ alert("Por favor, escreva o seu nome."); document.getElementById("rNome").focus(); return false; }
+  if(tipo!=="CONFIRMO" && !txt){ alert("Escreva um pouquinho sobre o que você sabe."); document.getElementById("rTexto").focus(); return false; }
+  S.nome=nome;
+  S.respostas.push({quem:nome,sobre:atual.rot,tipo:tipo,texto:txt});
+  salvar(); lista(); fechar("dlgPessoa");
+  alert("Pronto! Sua resposta foi guardada. Quando terminar, toque em “Enviar pelo WhatsApp”.");
+  return false;
+}
+function guardarNovo(e){
+  e.preventDefault();
+  var n={quem:document.getElementById("nNome").value.trim(),pessoa:document.getElementById("nPessoa").value.trim(),
+    rel:document.getElementById("nRel").value,de:document.getElementById("nDe").value.trim(),
+    onde:document.getElementById("nOnde").value.trim(),mais:document.getElementById("nQuem").value.trim()};
+  if(!n.quem||!n.pessoa){ alert("Escreva o seu nome e o nome da pessoa."); return false; }
+  S.nome=n.quem; S.novos.push(n); salvar(); lista(); fechar("dlgNovo");
+  ["nPessoa","nDe","nOnde","nQuem"].forEach(function(i){document.getElementById(i).value="";});
+  alert("Pronto! O parente foi guardado.");
+  return false;
+}
+
+/* ===== RESPOSTAS ===== */
+function texto(){
+  var t="🌳 Árvore da família: respostas"+(S.nome?" de "+S.nome:"")+"\n";
+  S.respostas.forEach(function(r,i){
+    var ic=r.tipo==="CONFIRMO"?"✔ Confirmo":(r.tipo==="CORRIJO"?"✏️ Corrijo":"➕ Acrescento");
+    t+="\n"+(i+1)+") "+r.sobre+" — "+ic+(r.texto?": "+r.texto:"")+(r.quem!==S.nome?" ("+r.quem+")":"");
+  });
+  S.novos.forEach(function(n){
+    t+="\n➕ NOVO PARENTE: "+n.pessoa+" ("+n.rel+(n.de?", parente: "+n.de:"")+")"+(n.onde?". Onde/quando: "+n.onde:"")+(n.mais?". Quem sabe mais: "+n.mais:"");
+  });
+  var tem=TAREFAS.filter(function(_,i){return S.feito[i];}).map(function(x){return x[0];});
+  if(tem.length) t+="\n\n📄 Já tenho em casa:\n- "+tem.join("\n- ");
+  return t;
+}
+function lista(){
+  var n=S.respostas.length+S.novos.length;
+  document.getElementById("cont").textContent=n?("Você tem "+n+(n===1?" resposta guardada. Toque em Enviar quando terminar.":" respostas guardadas. Toque em Enviar quando terminar.")):"Nenhuma resposta ainda";
+  var bg=document.getElementById("badge"); if(bg){ bg.textContent=n; bg.hidden=!n; }
+  var h="";
+  if(!n) h='<p class="small">Quando você responder, as respostas aparecem aqui. Depois toque em “Enviar pelo WhatsApp”. Elas ficam guardadas neste aparelho, e ninguém vê antes de você enviar.</p>';
+  S.respostas.forEach(function(r,i){ h+='<div class="mine"><b>'+r.sobre+'</b> — '+r.tipo.toLowerCase()+(r.texto?': '+esc(r.texto):'')+' <button onclick="apagar(\'r\','+i+')">Apagar</button></div>'; });
+  S.novos.forEach(function(x,i){ h+='<div class="mine"><b>Novo parente:</b> '+esc(x.pessoa)+' ('+esc(x.rel)+') <button onclick="apagar(\'n\','+i+')">Apagar</button></div>'; });
+  document.getElementById("minhas").innerHTML=h;
+}
+function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+function apagar(k,i){ if(!confirm("Apagar esta resposta?"))return; (k==="r"?S.respostas:S.novos).splice(i,1); salvar(); lista(); }
+function enviarZap(){
+  if(!S.respostas.length && !S.novos.length && !Object.keys(S.feito).some(function(k){return S.feito[k];})){ alert("Você ainda não respondeu nada. Toque em um quadradinho e conte o que sabe."); return; }
+  window.open("https://wa.me/"+ZAP+"?text="+encodeURIComponent(texto()),"_blank");
+}
+function copiar(){
+  var t=texto();
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(function(){alert("Copiado! Agora é só colar no WhatsApp.");},function(){prompt("Copie o texto abaixo:",t);}); }
+  else prompt("Copie o texto abaixo:",t);
+}
+/* ===== MAPA ===== */
+// [nome, lat, lon, ramo, c(documento)|p(relato), o que aconteceu, prova]
+var LUG = [
+ ["Imaruí e Cangueri (SC)",-28.33,-48.82,"valentina","c","Aristides (de Cangueri), Manoel Valentina e Maria Almecinda moraram aqui. Valmor nasceu aqui (1951). Manoel morreu aqui em 1995 e foi sepultado em Cangueri.","Óbito de Manoel (1995) e edital de casamento de Valmor (1971)"],
+ ["Florianópolis (SC), bairro do Estreito",-27.59,-48.58,"valentina","c","Valmor e Irani publicaram o edital de casamento em junho de 1971.","Diário da Justiça de SC, 22/06/1971"],
+ ["Joinville (SC)",-26.30,-48.85,"valentina","c","Silvano nasceu aqui (1975).","RG do Silvano e certidão do Alef"],
+ ["Brejo Santo (CE), antigo Brejo dos Santos",-7.49,-38.99,"santos","c","José Ignácio dos Santos nasceu aqui em 1913. Seus pais Antônio e Joaquina eram daqui.","Certidão de casamento de 1937"],
+ ["Crato (CE)",-7.23,-39.41,"santos","p","O caderno da vó Irani e uma árvore pública dizem que José nasceu no Crato.","Relato e árvore da internet (não confere com a certidão)"],
+ ["Caetité (BA)",-14.07,-42.48,"santos","c","Guiomar Campos nasceu aqui em 1918.","Certidão de casamento de 1937"],
+ ["Brumado (BA), antigo Bom Jesus das Minas / dos Meiras",-14.20,-41.66,"santos","c","Justino Campos Bahia (1872) e Balduína (1897) eram daqui.","Casamento de 1937 e registros do FamilySearch"],
+ ["Rio São Francisco (lugar exato desconhecido)",-13.25,-43.42,"santos","p","Conta-se que o bisavô Manoel Marcolino morreu atravessando o rio com uma tropa.","Caderno da vó Irani"],
+ ["Quintana, Glicério (SP)",-21.38,-50.21,"santos","c","José Ignácio e Guiomar se casaram aqui em 14/08/1937.","Certidão de casamento nº 347"],
+ ["Parnaso, Tupã (SP)",-21.97,-50.62,"santos","c","Irani nasceu aqui (1944). Três irmãos dela morreram bebês aqui (1939, 1940 e 1946).","Registros de óbito no FamilySearch"],
+ ["Bonito de Santa Fé (PB)",-7.31,-38.51,"ramalho","c","Julieta Ramalho de Sousa nasceu aqui em 10/01/1905.","Óbito de Julieta (1977)"],
+ ["Conceição (PB)",-7.56,-38.51,"ramalho","p","Manoel José de Souza e Virgulina Ramalho teriam se casado aqui (1907). É também a cidade natal da Elba Ramalho.","Árvore pública na internet (a confirmar)"],
+ ["Ibiara (PB)",-7.50,-38.41,"ramalho","p","Terra do ramo “Pinto Ramalho”, segundo livro de história de 1985.","Livro “Conceição do Piancó de Ontem e de Hoje” (a ler)"],
+ ["Itaporanga (PB)",-7.30,-38.15,"ramalho","c","Hilário e Juracy se casaram aqui em 26/01/1969.","Certidão de casamento enviada pela tia Lucilene"],
+ ["Diamante (PB), Sítio Sabonete",-7.42,-38.26,"ramalho","c","O vô Hilário (1943) e a vó Juracy (1946) nasceram em Diamante. Celiane nasceu no Sítio Sabonete em 1974.","Certidão de casamento dos avós e certidão da Celiane"],
+ ["Boa Ventura (PB)",-7.42,-38.21,"ramalho","c","Julieta morreu aqui em 1977. A certidão da Celiane foi registrada aqui em 1976.","Óbito de Julieta e certidão da Celiane"],
+ ["Diadema (SP)",-23.69,-46.62,"ramalho","c","Hilário e Juracy moravam aqui em 1978.","Certidão de nascimento da tia Neide"],
+ ["Ariquemes (RO)",-9.91,-63.04,"todos","c","Alef nasceu aqui em 1994. O vô Hilário aparece morando na comarca.","Certidão do Alef; Diário da Justiça de RO"],
+ ["Alto Paraíso (RO)",-9.71,-63.32,"todos","c","Silvano e Celiane se casaram aqui. Os netos foram registrados aqui. A bisavó Guiomar morreu aqui em 2008, e o caderno diz que José e Guiomar estão sepultados aqui.","Certidões, RGs e óbito de Guiomar"],
+ ["São Bernardo do Campo (SP)",-23.69,-46.56,"ramalho","c","A tia Neide nasceu aqui em 1978, no Hospital São Bernardo.","Certidão de nascimento da tia Neide"]
+];
+// caminhos de cada ramo (índices de LUG, em ordem de tempo)
+var CAM = {valentina:[0,1,2,18], santos:[6,5,3,8,9,1,18], ramalho:[10,11,13,14,15,16,17,18]};
+var COR = {valentina:"#1f5fbf", santos:"#7a3fa8", ramalho:"#8a5a2b", todos:"#2d2a26"};
+// pessoa -> lugares (índices de LUG)
+var LP = {aristides:[0],valentinaines:[0],manoel:[0],almecinda:[0],valmor:[0,1],irani:[9,1,18],silvano:[2,18],valmorbebe:[0],
+ antonio:[3],joaquina:[3],joseign:[3,4,8,9,18],guiomar:[5,8,9,18],justino:[6,5],balduina:[6],manoelcampos:[6],marcolino:[7],
+ s_anania:[9],s_amaniar:[9],s_irandir:[9],
+ julieta:[10,15],manoeljose:[11],virgulina:[11],eduardo:[12],hilario:[14,13,16,17],juracy:[14,13,16],miguel:[15],j_expedito:[15],j_josemariano:[15],j_severino:[15],
+ celiane:[14,15,18],alef:[17],alyson:[18],alex:[17],irmaos:[18],neide:[19,16],lucilene:[18],cicero:[15]};
+var mapa=null, camadas={}, MARC={};
+function iniciarMapa(){
+  document.getElementById("listaLugares").innerHTML=LUG.map(function(l){
+    return '<div class="mine" style="border-left:8px solid '+(l[4]==="c"?"var(--ok)":"var(--ask)")+'"><b>'+l[0]+'</b> — '+(l[4]==="c"?"✔ com documento":"? relato, a confirmar")+'<br>'+l[5]+'<br><span class="small">Prova: '+l[6]+'</span></div>';
+  }).join("");
+  if(typeof L==="undefined"){ document.getElementById("mapa").style.display="none"; document.getElementById("mapaAviso").style.display="block"; return; }
+  mapa=L.map("mapa",{scrollWheelZoom:false}).setView([-15.5,-48],4);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap"}).addTo(mapa);
+  ["valentina","santos","ramalho","todos"].forEach(function(r){ camadas[r]=L.layerGroup().addTo(mapa); });
+  Object.keys(CAM).forEach(function(r){
+    L.polyline(CAM[r].map(function(i){return [LUG[i][1],LUG[i][2]];}),{color:COR[r],weight:4,opacity:.75,dashArray:"8 8"}).addTo(camadas[r]);
+  });
+  LUG.forEach(function(l,idx){
+    var ok=l[4]==="c";
+    var pess=Object.keys(LP).filter(function(k){return LP[k].indexOf(idx)>=0;});
+    var bts=pess.map(function(k){return '<button style="font-size:14px;min-height:2.2rem;padding:.2rem .5rem;margin:.15rem" onclick="abrir(\''+k+'\')">'+(CURTO[k]||P[k].n)+'</button>';}).join("");
+    MARC[idx]=L.circleMarker([l[1],l[2]],{radius:11,color:ok?"#14663a":"#a04a00",weight:4,fillColor:ok?"#4caf50":"#ff9f1a",fillOpacity:.9,dashArray:ok?null:"4 3"})
+     .bindPopup('<div style="font-size:16px;line-height:1.4"><b>'+l[0]+'</b><br><span style="color:'+(ok?"#14663a":"#a04a00")+';font-weight:bold">'+(ok?"✔ Com documento":"? Relato, a confirmar")+'</span><br>'+l[5]+'<br><i>Prova: '+l[6]+'</i>'+(bts?'<br><b>Quem é daqui (toque):</b><br>'+bts:'')+'</div>',{maxWidth:300})
+     .addTo(camadas[l[3]]);
+  });
+}
+function verRamo(r){
+  if(!mapa) return;
+  Object.keys(camadas).forEach(function(k){ if(r==="todos"||k===r||k==="todos") mapa.addLayer(camadas[k]); else mapa.removeLayer(camadas[k]); });
+  var pts=LUG.filter(function(l){return r==="todos"||l[3]===r||l[3]==="todos";}).map(function(l){return [l[1],l[2]];});
+  mapa.fitBounds(pts,{padding:[30,30]});
+  document.querySelectorAll("#filtros button").forEach(function(b){b.classList.remove("main");});
+  event&&event.target&&event.target.classList.add("main");
+}
+
+var fs=20;
+function zoom(d){ fs=Math.max(16,Math.min(30,fs+d)); document.documentElement.style.setProperty("--fs",fs+"px"); }
+function abrirFS(fid){ if(avisoExterno()) window.open("https://ancestors.familysearch.org/pt/"+fid,"_blank","noopener"); }
+function avisoExterno(){
+  return confirm("Atenção: você vai sair da árvore da família e abrir o FamilySearch, um site público e gratuito de genealogia (não é nosso).\n\n• A página abre em outra aba. Para voltar, é só fechar a aba.\n• O que está lá foi escrito por várias pessoas e pode ter erros.\n• O site pode pedir para criar conta. Não precisa: dá para só olhar.\n• Não digite senha nem documento lá.\n\nQuer abrir?");
+}
+/* ===== PÁGINAS PÚBLICAS NO FAMILYSEARCH (só de pessoas falecidas) ===== */
+var FS = {
+ julieta:[["GHRM-LKY","Ver a Julieta no FamilySearch"]],
+ virgulina:[["GHMT-HXL","Ver a Virgulina no FamilySearch"]],
+ manoeljose:[["GHR9-QMG","Ver o Manoel José no FamilySearch"]],
+ miguel:[["GFPD-L4F","Ver o Miguel Mariano no FamilySearch"]],
+ eduardo:[["L2QG-NPH","Ver o Eduardo"],["G4BG-THP","Ver a Casimira"]],
+ marianorod:[["GLR1-RXC","Ver o Mariano Rodrigues"],["GLR1-1YM","Ver a Maria Alexandre"]],
+ estendeslau:[["GHRN-B7Q","Ver o Estendeslau"],["GHRJ-MSK","Ver a Rita"]],
+ manoel:[["PJ6R-MVJ","Ver o Manoel Valentina no FamilySearch"]],
+ aristides:[["PJ6R-3TT","Ver o Aristides no FamilySearch"]],
+ valentinaines:[["PJ65-JJL","Ver a Valentina Inês no FamilySearch"]],
+ joseign:[["GVSB-4D5","Ver o José Ignácio no FamilySearch"]],
+ guiomar:[["GVSB-CVB","Ver a Guiomar no FamilySearch"]],
+ justino:[["KCK1-HNG","Ver o Justino no FamilySearch"]],
+ balduina:[["K4RV-3J8","Ver a Balduína no FamilySearch"]],
+ manoelcampos:[["974T-NYJ","Ver o Manoel Ignácio Campos"],["974T-NYT","Ver a Maria de Jesus"]]
+};
+var FSNOTA = {
+ julieta:"Esta página foi montada por parentes Ramalho (Rubens e Jussara Ramalho), e o Alef anexou o óbito dela. De lá dá para subir a árvore até os Pinto Ramalho. Atenção: os elos mais antigos ainda não têm prova.",
+ virgulina:"Página montada por parentes Ramalho. Os pais e avós que aparecem lá ainda não foram conferidos em documento.",
+ eduardo:"Páginas montadas por outras pessoas. Ainda não têm documento anexado.",
+ manoel:"Página criada pelo Alef, com o registro de óbito anexado.",
+ joseign:"Página criada em 2023, provavelmente pelo Álex.",
+ guiomar:"Página criada em 2023, provavelmente pelo Álex."
+};
+
+/* ===== ATUALIZAÇÃO COM O DOSSIÊ CONSOLIDADO (23/11/2026) ===== */
+(function(){
+  function add(id,campo,txt){ if(P[id]) P[id][campo]=(P[id][campo]||[]).concat(txt); }
+  // filhos e cônjuges (primos e primas)
+  add("selma","sabe","Filhos: Diego, Ericsson e Wellington Patrick.");
+  add("celio","sabe","Filhos: Natieli, Eduardo e Letícia.");
+  add("neide","sabe","Filhos: Vitor Hugo e Natália. Mora em Goiânia/GO.");
+  add("lucilene","sabe",["Marido: Marcos André. Filhos: Maicon, Kauã e mais um (o nome varia entre as listas).","A família dizia que só ela tinha nascido em São Paulo. Mas a tia Neide também nasceu lá."]);
+  add("cicero","sabe","Faz aniversário em 16 de dezembro. Mora em Rondônia.");
+  add("eliane","sabe","O Lucas é casado com a Brenda.");
+  add("v_madalena","sabe","Mora em Joinville/SC.");
+  add("s_debora","sabe","Mora em Sorocaba/SP. Filhos: Robson e Rosana.");
+  add("s_natanael","sabe","Mora em São Paulo.");
+  add("s_justino","sabe","Mora em Mato Grosso.");
+  add("s_silas","sabe","Mora em Rondônia.");
+  add("s_paulo","sabe","Mora em Rondônia. Foi testemunha do casamento do Silvano e da Celiane (1998).");
+  add("s_iracema","sabe","Filhos: Roseli e Wilson. Neta: Patrícia (“Patt”).");
+  add("s_samuel","sabe","Filho: Fabrício.");
+  add("j_expedito","sabe","Tinha 34 anos em 1977, então nasceu por volta de 1943, como o vô Hilário. Uma Francisca de Souza (MS) fala de um “tio Expedito” que brincava com o Hilário: pode ser o mesmo.");
+  add("j_josemariano","sabe","Tinha 32 anos em 1977 (nasceu por volta de 1945).");
+  add("j_severino","sabe","Tinha 26 anos em 1977 (nasceu por volta de 1951).");
+  add("h_assis","sabe","A Leonice, do grupo da família, diz ser “a neta mais velha de dona Cândida”.");
+  // correções e detalhes
+  add("almecinda","sabe","Se ela tem 98 anos, nasceu por volta de 1928.");
+  add("manoel","sabe","Os apelidos “Toda” (ou “Totoda”) e “Tintina”, que a família lembra, parecem ser do pai de criação e da mãe dele.");
+  add("juracy","falta","Conferir: a certidão dá 30/08 como aniversário dela, o mesmo dia e mês da filha Celiane. Coincidência ou erro de escrita?");
+  add("miguel","sabe",["Segundo uma árvore pública, viveu de 1907 a 1993 e era filho de Mariano Rodrigues e Maria Alexandre (a confirmar).","No óbito da Julieta (1977) aparece como “natural da Paraíba, agricultor”."]);
+  add("manoelxavier","sabe","Há um candidato: um Manoel Xavier de Souza (1913 a 1994, Boa Ventura), filho de João Xavier de Sousa e Generosa Maria da Conceição. Mas o óbito dele diz “solteiro”, então a pista ficou fraca.");
+  add("julieta","sabe","Irmãos dela, segundo a árvore pública: José (1896 a 1986), João (1916 a 1981), Antônio, Fausta e Maria Luiza.");
+  add("manoeljose","sabe","Segundo a árvore pública, era filho de Estendeslau de Souza Borge e Rita Maria da Conceição. Mas as datas dessa árvore têm erros.");
+  add("virgulina","falta","A árvore pública diz que ela casou em 1907, mas os filhos nascem de 1896 em diante. Pode ser um casamento feito depois.");
+  add("guiomar","falta","Uma certidão diz que ela era “natural do Ceará”, e outra diz Caetité (BA). Qual é a certa?");
+  add("justino","falta","O casamento dele com a Balduína aparece em 1920, depois do nascimento da Guiomar (1918). Pode ter sido para regularizar.");
+  add("valmor","sabe","No jornal de 1971 o nome saiu errado: “Valmor Manoel Tolentina”, filho de “Manoel Valentino”.");
+  add("irani","sabe",["É a 5ª dos 18 filhos de José e Guiomar.","Em 1971 era missionária. Depois foi professora de Português."]);
+  P.cicero.aj="Contou lembranças no grupo da família";
+  P.alex.aj="Começou a árvore no FamilySearch em 2023 (provavelmente)";
+  // novas pessoas
+  Object.assign(P,{
+   s_julia:T("Júlia Inácio","“Tia” nos contatos do pai (Rondônia)","p",["Não aparece na lista dos 18 irmãos do caderno."],["Ela é irmã da vó Irani ou parente por casamento?"]),
+   s_olimpia:T("Olímpia Inácio","“Tia” nos contatos do pai (Rondônia)","p",["Não aparece na lista dos 18 irmãos do caderno."],["Ela é irmã da vó Irani ou parente por casamento?"]),
+   gessi:T("Gessi Valentina da Conceição","Possível meia-irmã do bisavô Manoel (Santa Catarina)","p",["Num jornal de 1965 aparece como filha de Gregório Henrique da Conceição e de Valentina Inês da Conceição, o mesmo nome da mãe do Manoel."],["Saber se é a mesma Valentina Inês."],"Alguém de SC conheceu a Gessi?"),
+   miguelmv:T("Miguel Manoel Valentina","Nome raro achado em SC (1950)","p",["Aparece numa lista oficial de Santa Catarina em 1950. Pode ser irmão, tio ou primo do Manoel."],["Quase nada: é só uma pista."],"Alguém já ouviu falar de um Miguel Valentina?"),
+   nena:T("Nena","Prima. Diz ser filha da Laura","p",["É casada com um João, que sofreu um acidente com alta tensão em 2025.","Conta-se que o marido seria primo do presidente Lula. Ver as histórias."],["O nome completo dela e o do marido."],"Qual é o nome completo da Nena?"),
+   leonice:T("Leonice","Prima. “Neta mais velha de dona Cândida”","p",["Participa do grupo de saúde do vô Hilário."],["De qual irmão do Hilário ela é filha?"],"Leonice, você é filha de qual irmão do vô Hilário?"),
+   marianorod:T("Mariano Rodrigues e Maria Alexandre","Pais do bisavô Miguel Mariano (segundo árvore pública)","p",["Nomes que aparecem numa árvore feita por outras pessoas no FamilySearch."],["Nenhum documento ainda."]),
+   estendeslau:T("Estendeslau de Souza Borge e Rita Maria da Conceição","Pais do trisavô Manoel José (segundo árvore pública)","p",["Estendeslau (1850) e Rita (1853), segundo a árvore pública."],["Nenhum documento ainda. As datas dessa árvore têm erros."]),
+   joaoxavier:T("João Xavier de Sousa e Generosa Maria da Conceição","Talvez pais do bisavô Manoel Xavier (pista fraca)","p",["Aparecem como pais de um Manoel Xavier de Souza (1913 a 1994) que pode ser o bisavô."],["A pista enfraqueceu: esse Manoel aparece como “solteiro”, e a Generosa achada na internet é de Pernambuco."],"Alguém lembra do nome dos avós do vô Hilário?")
+  });
+  CURTO.marianorod="Mariano e Maria"; CURTO.estendeslau="Estendeslau e Rita"; CURTO.joaoxavier="João e Generosa?";
+  // árvore: novas linhas
+  G.valentina.push(["Possíveis parentes do bisavô Manoel (pistas)",[["gessi"],["miguelmv"]]]);
+  G.santos[G.santos.length-1][1].push(["s_julia"],["s_olimpia"]);
+  G.ramalho.splice(1,0,["Pais dos bisavós (árvores da internet, a confirmar)",[["estendeslau"],["marianorod"],["joaoxavier"]]]);
+  G.ramalho.push(["Primos e primas do lado do vô Hilário",[["nena"],["leonice"]]]);
+  // roda: pais do Miguel e do Manoel José
+  ANEIS[4][14]="estendeslau";
+  ANEIS[3][12]="marianorod"; ANEIS[3][13]="marianorod";
+  ANEIS[3][8]="joaoxavier"; ANEIS[3][9]="joaoxavier";
+  // mapa: novos lugares (índices 20, 21, 22)
+  LUG.push(["São José de Piranhas (PB)",-7.12,-38.50,"ramalho","p","Antiga paróquia de Bonito de Santa Fé: o batismo da Julieta (1905) pode estar nos livros daqui.","Pesquisa nas dioceses (a confirmar)"]);
+  LUG.push(["Teixeira (PB)",-7.22,-37.25,"ramalho","p","Livros de batismo antigos onde pode estar um ancestral do ramo do Zé Ramalho.","Pesquisa do ChatGPT (hipótese)"]);
+  LUG.push(["Brejo do Cruz (PB)",-6.34,-37.50,"ramalho","p","Cidade natal do cantor Zé Ramalho. Será que somos parentes?","Hipótese da família"]);
+  LP.julieta=[10,15,20];
+  // histórias atualizadas
+  HIST[0].x="Elba nasceu em Conceição (PB), onde em 1907 casaram os trisavós Manoel José e Virgulina Ramalho. Ela e o compositor Luiz Ramalho dizem em entrevistas ser “do mesmo Ramalho”. Uma árvore da internet liga a Virgulina ao clã Pinto Ramalho e, por ele, ao ramo do Zé Ramalho. Se essa árvore estiver certa, a bisavó Julieta e o Zé Ramalho seriam primos distantes. Mas um dos elos dessa árvore não tem prova.";
+  HIST[1].x="Conta-se que a prima Nena, filha da Laura, casou com um João Inácio da Silva, primo do Lula. A pesquisa achou um João Inácio da Silva famoso, mas ele é o avô do Lula, não um primo. No grupo da família, a Nena fala só em “João”. Se for verdade, o parentesco seria por casamento, e não de sangue.";
+  HIST[2].x="O que a família contou, por escrito, é que os Souza da Paraíba tiveram brigas de terra CONTRA o bando de Lampião, e não que eram parentes dele. Nenhum sobrenome dos nossos bisavós aparece na família do Lampião.";
+  HIST.push({t:"👵 “Toda” e “Tintina”",x:"A família lembra de bisavós chamados “Toda” e “Tintina Valentina”. O caderno da vó Irani dá uma pista: “Totoda” seria o pai de criação do bisavô Manoel, e “Tintina”, o apelido da mãe dele (Constantina? Valentina?). O registro de óbito do Manoel diz que os pais eram Aristides Domingos da Rosa e Valentina Inês da Conceição.",q:"Quem eram o Totoda e a Tintina? Eram apelidos?"});
+  HIST.push({t:"👬 Cosme e Damião",x:"A família lembra de um “Cosme e Damião” do lado da mãe, mas não sabe se eram irmãos ou tios. Os gêmeos Cosme e Damião que a pesquisa achou em Ibiara (1953) não são da nossa família direta.",q:"De quem eram filhos o Cosme e o Damião?"});
+  // achados de 23/11, 00h55 (óbitos de Virgulina e de Eduardo no FamilySearch)
+  P.virgulina.d="26/08/1872 (Conceição/PB) a 30/12/1958 (Piancó/PB)";
+  P.virgulina.sabe=["Mãe da Julieta (óbito dela, 1977).","Registro de óbito de 1958 lido no livro original de Piancó/PB: viúva, 88 anos, filha de Eduardo Pinto Ramalho e Casimira Maria da Conceição."];
+  P.virgulina.falta=["A árvore pública diz que ela casou em 1907, mas os filhos nascem de 1896 em diante. Pode ser um casamento feito depois."];
+  P.eduardo.s="c";
+  P.eduardo.d="Pais da Virgulina. Eduardo morreu em 25/10/1892, em Conceição/PB, com 59 anos";
+  P.eduardo.sabe=["O óbito da Virgulina (1958), lido no original, diz que ela era filha de Eduardo Pinto Ramalho e Casimira Maria da Conceição.","O óbito do próprio Eduardo (1892, Conceição/PB) diz que ele era filho de Manoel Alexandre Pinto Ramalho e Victoria Pinto de São Roberto."];
+  P.eduardo.falta=["Ver a imagem do óbito do Eduardo (por enquanto só lemos o resumo do site).","Confirmar os irmãos da Virgulina que aparecem na árvore pública."];
+  P.manoelalexandre=T("Manoel Alexandre Pinto Ramalho e Victoria Pinto de São Roberto","Pais do Eduardo (avós da Virgulina)","p",["Aparecem como pais do Eduardo no registro de óbito dele (1892, Conceição/PB), pelo resumo do site.","Daqui para trás, a árvore da internet sobe até o Capitão José Pinto Ramalho (1713 a 1782), mas o elo Manoel Alexandre → Aleixo Pinto Ramalho ainda não tem prova."],["Ver a imagem do óbito de 1892.","Achar documento dos pais do Manoel Alexandre."],"Alguém já ouviu o nome “Victoria Pinto”?");
+  CURTO.manoelalexandre="Manoel Alexandre e Victoria";
+  FS.manoelalexandre=[["LKDW-MC1","Ver o Manoel Alexandre"]];
+  FSNOTA.manoelalexandre="Página montada por parentes Ramalho. Os elos mais antigos ainda não têm prova.";
+  G.ramalho.splice(0,1,["Pentavós (avós da Virgulina)",[["manoelalexandre"]]],["Tetravós (pais da Virgulina)",[["eduardo"]]]);
+  FSNOTA.eduardo="Páginas montadas por parentes Ramalho. A do Eduardo tem 26 documentos anexados, entre eles o óbito dele (1892).";
+  LUG.push(["Piancó (PB)",-7.20,-37.93,"ramalho","c","A trisavó Virgulina morreu aqui em 30/12/1958, viúva, com 88 anos.","Registro de óbito (livro de Piancó 1956–1959)"]);
+  LUG[11][5]="A trisavó Virgulina nasceu aqui em 1872, e o pai dela, Eduardo Pinto Ramalho, morreu aqui em 1892. Diz-se que Manoel José e Virgulina se casaram aqui (1907). É também a cidade natal da Elba Ramalho.";
+  LUG[11][6]="Registros civis de óbito (resumo do FamilySearch); casamento de 1907 a confirmar";
+  LP.virgulina=[11,23]; LP.eduardo=[11]; LP.manoelalexandre=[11];
+  HIST[0].x="Elba nasceu em Conceição (PB), onde nasceu a trisavó Virgulina Ramalho (1872). Já temos documento ligando a bisavó Julieta à Virgulina, a Virgulina ao pai Eduardo Pinto Ramalho e o Eduardo ao pai Manoel Alexandre Pinto Ramalho. Uma árvore da internet liga o Manoel Alexandre ao clã Pinto Ramalho e, por ele, ao ramo do Zé Ramalho; se estiver certa, a Julieta e o Zé Ramalho seriam primos distantes. Esse último elo ainda não tem prova.";
+  // achados de 23/11, 01h (segunda rodada no FamilySearch)
+  P.miguel.n="Miguel Mariano Rodrigues";
+  P.miguel.d="14/04/1907 a 06/10/1993. Pai da vó Juracy";
+  P.miguel.sabe=["O óbito dele (1993, livro de Ibiara/PB) dá o nome completo, Miguel Mariano Rodrigues, e os pais: Mariano Rodrigues e Maria Alexandre. Lemos o resumo do site; a imagem ainda vamos ler.","No óbito da Julieta (1977) aparece como “natural da Paraíba, agricultor”."];
+  P.miguel.falta=["Ler a imagem do óbito de 1993."];
+  P.miguel.q="Alguém lembra do bisavô Miguel? Onde ele morava em 1993?";
+  CURTO.miguel="Miguel Mariano";
+  P.marianorod.sabe=["Aparecem como pais do Miguel no registro de óbito dele (1993), pelo resumo do site."];
+  P.marianorod.falta=["Datas e lugares. Nenhum documento deles ainda."];
+  P.virgulina.sabe.push("Irmãos dela, pela árvore pública: Sabino, João, Maria Dionizia, Guilhermino, José, Maria, Amália, Jó, Cícero e Antônio (11 filhos de Eduardo e Casimira).");
+  P.manoel.sabe.push("Achamos no site o registro de um casamento em Imaruí, em 14/05/1946, de um filho de Aristides Domingos da Rosa e Inês da Conceição com uma noiva nascida em 1928. O nome “Almecinda” e o lugar Cangueri aparecem no registro. Tudo indica que é o casamento dele com a Maria Almecinda, mas o texto foi lido por máquina e ainda vamos conferir na imagem.");
+  P.almecinda.sabe.push("O provável registro de casamento (Imaruí, 14/05/1946) diz que a noiva nasceu em 1928. Isso bate com o caderno da vó Irani, que diz que ela tem 98 anos.");
+  P.aristides.d="Por volta de 1907 a 1973. Lavrador, de Cangueri, Imaruí/SC";
+  P.aristides.sabe=["Consta como pai de Manoel Valentina no óbito de 1995.","Achamos no site o óbito dele: morreu no hospital de Imaruí, provavelmente em janeiro de 1973, com 66 anos, lavrador. Pais: Domingos da Rosa e Rosa Sergina Ana de Jesus (texto lido por máquina, a conferir).","No mesmo registro aparece um “Antônio Aristides da Rosa”. Seria o “Antônio Rosa” do caderno da vó Irani?"];
+  P.aristides.falta=["Ler a imagem do óbito (1973)."];
+  P.domingosrosa=T("Domingos da Rosa e Rosa Sergina Ana de Jesus","Pais do trisavô Aristides (Imaruí/SC)","p",["Aparecem como pais do Aristides no óbito dele (c. 1973), num resumo feito por máquina."],["Conferir a grafia na imagem.","Datas e lugares."],"Alguém de Imaruí já ouviu falar do Domingos ou da Rosa Sergina?");
+  CURTO.domingosrosa="Domingos e Rosa Sergina";
+  G.valentina.unshift(["Tetravós (pais do Aristides)",[["domingosrosa"]]]);
+  ANEIS[4][0]="domingosrosa";
+  LP.domingosrosa=[0];
+  // achados de 23/11, 01h18 (imagens baixadas e lidas)
+  P.manoel.d="12/05/1929 a 11/11/1995. Nasceu “Manoel Aristides da Rosa”";
+  P.manoel.sabe=["Registro de óbito lido (1995): aposentado, casado com Maria Almecinda de Jesus, deixou 10 filhos. Sepultado no cemitério de Cangueri.","ACHADO: a certidão de casamento dele (Imaruí, 14/05/1946) mostra que ele se chamava MANOEL ARISTIDES DA ROSA. Em 1956, por ordem da Justiça (comarca de Laguna), o nome foi mudado para MANOEL VALENTINA, e a data de nascimento foi corrigida para 12/05/1929.","É a prova de que o sobrenome da família era “da Rosa” e virou “Valentina”, ao que parece pelo nome da mãe dele, Valentina Inês."];
+  P.manoel.falta=["Saber por que ele pediu a mudança de nome em 1956 (o processo deve estar no Fórum de Laguna)."];
+  P.manoel.q="Alguém sabe por que o bisavô Manoel trocou “da Rosa” por “Valentina”?";
+  P.almecinda.d="Nasceu em 1928. Esposa de Manoel. Viva, segundo o caderno";
+  P.almecinda.s="c";
+  P.almecinda.sabe=["Certidão de casamento lida (Imaruí, 1946): Maria Almecinda de Jesus, doméstica, moradora de Cangueri, nascida em 1928.","Filha de Marcolino Abil(?) de Oliveira e Almecinda Jardina(?) de Jesus.","O nome também está no óbito do marido (1995)."];
+  P.almecinda.falta=["Confirmar se ainda vive e onde mora (o caderno diz que tem 98 anos)."];
+  P.marcolinooliv=T("Marcolino Abil de Oliveira e Almecinda Jardina de Jesus","Pais da bisavó Maria Almecinda (Cangueri, Imaruí/SC)","c",["Aparecem como pais da Maria Almecinda na certidão de casamento dela (1946). A letra do segundo nome de cada um está difícil de ler (“Abil”? “Jardina”?)."],["Grafia certa dos nomes.","Datas e óbitos."],"Alguém de Cangueri lembra do Marcolino ou da dona Almecinda?");
+  CURTO.marcolinooliv="Marcolino e Almecinda";
+  P.aristides.s="c";
+  P.aristides.d="Por volta de 1907 a 19/01/1973. Lavrador, morava em Itapeva (Imaruí/SC)";
+  P.aristides.sabe=["Consta como pai de Manoel no óbito de 1995 e na certidão de casamento de 1946.","Óbito lido (1973): morreu num acidente, no hospital de Imaruí, com 66 anos, casado. Filho de Domingos (Gomes?) da Rosa e Rosa Sergina Ana de Jesus. Sepultado em Cangueri.","Quem registrou o óbito foi Antônio Aristides da Rosa, provavelmente um filho. Seria o “Antônio Rosa” do caderno da vó Irani?"];
+  P.aristides.falta=["Saber com quem ele era casado em 1973."];
+  P.domingosrosa.s="c";
+  P.domingosrosa.sabe=["Aparecem como pais do Aristides no óbito dele (1973), que foi lido."];
+  P.domingosrosa.falta=["A grafia do sobrenome do Domingos (Gomes?).","Datas e lugares."];
+  P.miguel.d="14/04/1907 (Diamante/PB) a 06/10/1993 (Ibiara/PB)";
+  P.miguel.sabe=["Óbito lido (1993, Ibiara/PB): nasceu em Diamante, era aposentado, casado, deixou 5 filhos. Filho de Mariano Rodrigues e Maria Alexandre. Sepultado no cemitério Santa Maria, em Ibiara.","Quem registrou foi o filho Severino Mariano.","No óbito da Julieta (1977) aparece como “natural da Paraíba, agricultor”."];
+  P.miguel.falta=["Ele casou depois de 1977? O óbito cita um casamento (nº 533). Com quem?"];
+  P.marianorod.s="c";
+  P.marianorod.sabe=["Aparecem como pais do Miguel no óbito dele (1993), que foi lido."];
+  G.valentina.splice(1,0,["Pais da bisavó Maria Almecinda",[["marcolinooliv"]]]);
+  ANEIS[3][2]="marcolinooliv"; ANEIS[3][3]="marcolinooliv";
+  LUG[12][5]="Terra do ramo “Pinto Ramalho”. O bisavô Miguel Mariano morreu aqui em 1993 e foi sepultado no cemitério Santa Maria.";
+  LUG[12][4]="c"; LUG[12][6]="Óbito do Miguel Mariano (1993)";
+  LUG[0][5]="Berço dos Valentina. O bisavô Manoel (que nasceu “Manoel Aristides da Rosa”) casou aqui com Maria Almecinda em 1946 e mudou o nome para Valentina em 1956. Valmor nasceu aqui (1951). Aristides morreu aqui em 1973 e Manoel em 1995, os dois sepultados em Cangueri.";
+  LUG[0][6]="Certidão de casamento (1946, com a retificação de 1956), óbitos de Aristides (1973) e Manoel (1995)";
+  LP.miguel=[14,15,12]; LP.marcolinooliv=[0];
+  HIST.forEach(function(h){ if(/sobrenome “Valentina”/.test(h.t)){ h.x="AGORA TEMOS A PROVA. A certidão de casamento do bisavô Manoel (Imaruí, 1946) diz que ele se chamava Manoel Aristides da Rosa, filho de Aristides Domingos da Rosa e Valentina Inês da Conceição. Numa anotação de 1956, o cartório registra que a Justiça mandou mudar o nome dele para MANOEL VALENTINA. Ou seja: o sobrenome da família era “da Rosa”, e “Valentina” veio do nome da mãe dele."; h.q="Alguém sabe por que ele mudou de nome? Foi para homenagear a mãe?"; h.t="🔤 De onde vem o sobrenome “Valentina” (RESOLVIDO!)"; } });
+  // achados de 23/11, 01h33
+  P.gessi.sabe.push("Atualização: a Valentina Inês casada com o Gregório parece ser outra pessoa, a Valentina Ignez Bittencourt (1913 a 2008), de Florianópolis. Então a Gessi provavelmente não é parente nossa.");
+  P.gessi.d="Pista enfraquecida: provavelmente homônima";
+  P.valentinaines.falta=["Quando nasceu e morreu. Achamos uma Valentina Inês da Conceição que morreu em Blumenau em 1983, com 75 anos, filha de Inês Maria da Conceição, mas não dá para saber se é ela.","Quem eram os pais dela."];
+  P.manoelalexandre.sabe.push("A mãe do Eduardo, Victória, nasceu por volta de 1813 nos Inhamuns, no Ceará (segundo a árvore pública).","A árvore pública diz que o Manoel Alexandre era filho de Aleixo Luna Pinto Ramalho e irmão do Tenente João Ramalho de Luna, de quem descende o cantor Zé Ramalho. Mas as datas não fecham, então isso ainda não está provado.");
+  P.miguel.falta=["O óbito cita um casamento dele (nº 533, folha 268). Com quem ele casou depois da Julieta? Não achamos esse registro na internet: só no cartório."];
+  // achados de 23/11, 07h
+  P.aristides.sabe.push("O índice do livro de casamentos de Imaruí (1941 a 1945) mostra que ele casou no civil nesse período. Ainda não sabemos com quem: pode ter sido com a Valentina Inês ou com outra mulher.");
+  P.aristides.falta=["Achar o termo de casamento dele (folha 49 do livro de 1941 a 1945) para saber com quem casou."];
+  P.manoelalexandre.sabe.push("Num livro de casamentos de Missão Velha (Ceará), em 1811, aparecem como testemunhas um Aleixo Ramalho e o filho, Aleixo Pinto Ramalho Júnior, já adulto. Isso torna possível (mas ainda não provado) que o Júnior seja o pai do Manoel Alexandre.");
+  // tarefas novas
+  TAREFAS.push(["Foto reta e com boa luz de cada página do caderno da vó Irani","Algumas partes estão borradas, como o começo da página dos 18 filhos."]);
+  TAREFAS.push(["Saber se a Laura era irmã do vô Hilário, e o nome completo da Nena","Ajuda a entender a história do primo do Lula."]);
+  TAREFAS.push(["Certidão de óbito da bisavó Cândida e do bisavô Manoel Xavier","Mostram os pais deles e abrem mais uma geração."]);
+  // achados de 28/11/2026
+  P.valentinaines.d="Por volta de 1908 a 25/06/1983 (Blumenau/SC)";
+  P.valentinaines.sabe=["Consta como mãe de Manoel Valentina no óbito de 1995 e no casamento dele (1946).","O óbito dela foi lido: morreu em Blumenau em 25/06/1983, com 75 anos, solteira, filha de Inês Maria da Conceição. Deixou um único filho, Manoel.","É dela a origem do nosso sobrenome: o filho trocou “da Rosa” por “Valentina” em 1956."];
+  P.valentinaines.falta=["Onde nasceu (Imaruí?) e quem era o pai dela.","Por que foi morar em Blumenau."];
+  P.inesmae=T("Inês Maria da Conceição","Mãe da Valentina Inês (pentavó)","c",["Aparece como mãe no óbito da Valentina Inês (1983), que foi lido.","Pista sem prova: uma Isabel Leandro dos Passos, de Cangueri, que morreu em 1969, também era filha de uma Inês Maria da Conceição. Pode ser irmã da Valentina."],["Datas, lugar e marido."],"Alguém lembra da mãe da bisavó Valentina?");
+  CURTO.inesmae="Inês Maria (mãe da Valentina)"; LP.inesmae=[0];
+  P.aristides.d="03/10/1906 a 19/01/1973. Cangueri, Imaruí/SC";
+  P.aristides.sabe=["Consta como pai de Manoel nos documentos dele (1946 e 1995).","Nasceu em 03/10/1906, filho de Domingos Tomé da Rosa e Sergina Ana Rosa de Jesus.","Em 02/08/1943 casou em Imaruí com Maurília Rosa de Jesus e reconheceu 5 filhos dela. O Manoel não aparece nesse casamento: ele era filho de Aristides com a Valentina Inês, que nunca se casaram.","Morreu num acidente em 19/01/1973, com 66 anos, e foi sepultado em Cangueri. Quem registrou foi o filho Antônio Aristides da Rosa."];
+  P.aristides.falta=["O caderno da vó Irani diz que o pai do Manoel era um “Antônio Rosa”, e os documentos dizem Aristides. O Antônio filho do Aristides só nasceu depois de 1933, então não pode ser ele."];
+  P.aristides.q="Alguém conheceu os filhos do Aristides com a Maurília (Antônio, Lúcio, Otacílio, Nair e Maria)? São meios-irmãos do bisavô Manoel.";
+  P.domingosrosa.n="Domingos Tomé da Rosa e Sergina Ana Rosa de Jesus";
+  P.domingosrosa.sabe=["Casaram em Imaruí em 07/01/1900: ele com 25 anos e ela com 20. Registro lido.","São os pais do Aristides (casamento de 1943 e óbito de 1973)."];
+  P.domingosrosa.falta=["Datas de morte."];
+  CURTO.domingosrosa="Domingos e Sergina";
+  P.tetravosrosa=T("Tomé da Rosa e Maria Albina de Jesus","Pais do Domingos (Imaruí/SC)","c",["Aparecem como pais do Domingos no casamento dele (1900). Em 1901 o Tomé já tinha morrido."],["Datas e lugares."],"");
+  CURTO.tetravosrosa="Tomé e Maria Albina"; LP.tetravosrosa=[0];
+  P.tetravospassos=T("José Maximiano Alves dos Passos e Ana Rosa de Jesus","Pais da Sergina (Imaruí/SC)","c",["Aparecem como pais da Sergina no casamento dela (1900). A Ana Rosa morreu antes de maio de 1900, e o José Maximiano casou de novo."],["Datas e lugares."],"Os “Passos” de Cangueri são parentes nossos por aqui.");
+  CURTO.tetravospassos="José Maximiano e Ana Rosa"; LP.tetravospassos=[0];
+  P.maurilia=T("Maurília Rosa de Jesus","Esposa do Aristides desde 1943 (não é nossa antepassada)","c",["Nasceu em 08/10/1910, filha de Tomé Manoel Graciano e Rosa Florência de Jesus.","Casou com o Aristides em Imaruí em 02/08/1943."],["Óbito."],"");
+  CURTO.maurilia="Maurília (esposa do Aristides)"; LP.maurilia=[0];
+  P.filhosaristides=T("Filhos de Aristides e Maurília","Meios-irmãos do bisavô Manoel","c",["Antônio, Lúcio, Otacílio, Nair e Maria Aristides da Rosa, nascidos entre 1933 e 1941 e reconhecidos no casamento de 1943."],["Se ainda vivem e onde moram os descendentes."],"Alguém conhece os Aristides da Rosa de Imaruí?");
+  CURTO.filhosaristides="Meios-irmãos do Manoel"; LP.filhosaristides=[0];
+  P.manoel.sabe.push("Nasceu com o nome Manoel Aristides da Rosa. Em 1956, a Justiça mudou o nome para Manoel Valentina e corrigiu a data de nascimento para 12/05/1929.","Procuramos o registro de nascimento dele no livro de Imaruí de dez/1927 a set/1929, termo por termo, e ele não está lá. Deve ter sido registrado depois.");
+  P.manoel.falta=["Certidão de nascimento de inteiro teor (cartório de Imaruí). O livro seguinte, de out/1929 a mar/1930, só pode ser consultado num Centro do FamilySearch."];
+  P.almecinda.d="Nasceu em 15/02/1928. Esposa de Manoel. A família escreve também “Almesinda”";
+  P.almecinda.sabe=["Casou com o Manoel em Imaruí em 14/05/1946. Registro lido: doméstica, de Cangueri, filha de Marcolino Abil(?) de Oliveira e Almecinda Jardina(?) de Jesus.","O nome está no óbito do marido (1995)."];
+  P.irmaosvalmor.n="Irmãos do Valmor (filhos de Manoel e Maria)";
+  P.irmaosvalmor.sabe.push("Num áudio de 27/11/2026, a vó Irani lembrou 11 nomes: Vava, José, Valmor, Lorena, Helena, Madalena, Joaquim, Filomena, Bernadete, Nico e Guiomar. Vava e Nico podem ser os apelidos de Lorival e Antônio (“Nica”).");
+  P.v_guiomar.n="Guiomar Manoel Valentina"; P.v_guiomar.s="c"; P.v_guiomar.d="Irmão do vô Valmor. Morreu em 27/05/1973";
+  P.v_guiomar.sabe=["O registro de óbito (Imaruí, 27/05/1973, Cangueri de Fora) diz “filho de Manoel Valentina e Maria Almecinda de Jesus”; quem registrou foi o próprio Manoel.","O caderno diz que morreu bebê, e a vó Irani lembra dele como o caçula. Precisamos ver a idade no registro."];
+  P.v_guiomar.falta=["Idade quando morreu."];
+  P.valmorbebe=T("Roberto Valmor Valentina","Irmão do Silvano, gêmeo do Jackson","c",["Nasceu e faleceu em 25/05/1977, em Santa Catarina. Há registro (no índice aparece só como “Valmor Valentina”).","Era o gêmeo do tio Jackson (informação do Alef, 28/11/2026)."],["Nada mais a buscar."],"");
+  CURTO.valmorbebe="Roberto (gêmeo do Jackson)";
+  P.joseign.d="31/01/1913 a 06/05/1995. Nasceu em Brejo dos Santos/CE (hoje Brejo Santo)";
+  P.joseign.sabe.push("O registro de óbito da filha Irandir (Tupã/SP, 1946) diz que ele era “natural de Brejos dos Santos, Ceará”. O Crato fica descartado.");
+  P.guiomar.sabe.push("O mesmo registro de 1946 diz que ela era “natural de Bom Jesus dos Meiras, Bahia” (hoje Brumado). A família diz Caitité: as duas cidades são vizinhas.");
+  HIST.unshift({t:"👶 Valentina, mãe solteira",x:"O óbito da bisavó Valentina Inês (Blumenau, 1983) diz que ela era solteira e deixou um único filho, o Manoel. O pai, Aristides, casou-se em 1943 com outra mulher, a Maurília, e teve mais 5 filhos. Por isso o Manoel trocou o sobrenome do pai (“da Rosa”) pelo nome da mãe (“Valentina”) em 1956.",q:"Alguém sabe como o Manoel foi criado? Ele conviveu com os meios-irmãos?"});
+})();
+
+/* ===== ÁRVORE INTERATIVA EXPANSÍVEL (D3) ===== */
+function PS(id,kids){ return {id:id,children:kids||[]}; }
+function GR(t,ids){ return {grupo:t,children:ids.map(function(k){return {id:k,children:[]};})}; }
+function UNK(t){ return {unk:t,children:[]}; }
+var GRAFO=null;
+function montarTree(){
+  return {id:"irmaos",children:[
+    GR("Os quatro netos",["alef","alyson","alex","adrian"]),
+    PS("silvano",[
+      PS("valmor",[
+        PS("manoel",[
+          PS("aristides",[PS("domingosrosa",[PS("tetravosrosa"),PS("tetravospassos")]),PS("maurilia"),PS("filhosaristides")]),
+          PS("valentinaines",[PS("inesmae")]),
+          GR("Possíveis parentes do Manoel (pistas)",["gessi","miguelmv"])
+        ]),
+        PS("almecinda",[PS("marcolinooliv")]),
+        GR("Irmãos do vô Valmor (10)",["v_jose","v_lorival","v_lorena","v_madalena","v_helena","v_filomena","v_bernadete","v_antonio","v_guiomar","v_joaquim"])
+      ]),
+      PS("irani",[
+        PS("joseign",[PS("antonio",[UNK("Pais de Antônio Ignácio dos Santos")]),PS("joaquina",[UNK("Pais de Joaquina Maria da Conceição")])]),
+        PS("guiomar",[PS("justino",[PS("manoelcampos")]),PS("balduina",[PS("marcolino")])]),
+        GR("Irmãos da vó Irani (18 filhos)",["s_anania","s_amaniar","s_francina","s_jaci","s_irandir","s_orandi","s_ananias","s_natanael","s_paulo","s_debora","s_jose","s_guiomar","s_dagmar","s_justino","s_silas","s_samuel","s_iracema","s_julia","s_olimpia"])
+      ]),
+      GR("Irmãos do Silvano (tios)",["paulo","eliane","jackson","valmorbebe","vania"])
+    ]),
+    PS("celiane",[
+      PS("hilario",[
+        PS("manoelxavier",[PS("joaoxavier")]),
+        PS("candida",[UNK("Pais de Cândida Maria da Conceição")]),
+        GR("Irmãos do vô Hilário",["h_assis","h_naldo","h_diassis","h_laura"]),
+        GR("Primos (filhos dos irmãos do Hilário)",["nena","leonice"])
+      ]),
+      PS("juracy",[
+        PS("miguel",[PS("marianorod")]),
+        PS("julieta",[
+          PS("manoeljose",[PS("estendeslau")]),
+          PS("virgulina",[PS("eduardo",[PS("manoelalexandre",[UNK("Pais de Manoel Alexandre e de Victória")])])])
+        ]),
+        GR("Irmãos da vó Juracy",["j_expedito","j_josemariano","j_severino"])
+      ]),
+      GR("Irmãos da Celiane (tios)",["selma","lucilene","neide","celio","cicero"])
+    ])
+  ]};
+}
+function quebra(t,max){ var w=String(t).split(" "),l=[""],i; for(i=0;i<w.length;i++){ if((l[l.length-1]+" "+w[i]).trim().length>max && l[l.length-1]) l.push(w[i]); else l[l.length-1]=(l[l.length-1]+" "+w[i]).trim(); } if(l.length>2){ l=[l[0],(l.slice(1).join(" ")).slice(0,max-1)+"…"]; } return l; }
+function kids(d){ return d.children||d._children||null; }
+function desenharGrafo(){
+  if(typeof d3==="undefined"){ document.getElementById("grafo").style.display="none"; document.getElementById("grafoBotoes").style.display="none"; document.getElementById("grafoAviso").style.display="block"; document.getElementById("listaArvore").open=true; return; }
+  var W=230,H=60,DX=290,DY=76;
+  var box=document.getElementById("grafo");
+  var svg=d3.select(box).append("svg");
+  var g=svg.append("g");
+  var gl=g.append("g"), gn=g.append("g");
+  var zoom=d3.zoom().scaleExtent([0.25,2.5]).on("zoom",function(e){ g.attr("transform",e.transform); });
+  svg.call(zoom).on("dblclick.zoom",null);
+  var root=d3.hierarchy(montarTree());
+  root.descendants().forEach(function(d){ if(d.depth>=1 && (d.data.grupo || d.depth>=2) && d.children){ d._children=d.children; d.children=null; } });
+  var tree=d3.tree().nodeSize([DY,DX]).separation(function(a,b){ return a.parent===b.parent?1:1.15; });
+  function info(d){
+    var x=d.data;
+    if(x.grupo) return {t:x.grupo,s:"📁 "+(kids(d)||[]).length+" pessoas — toque para abrir",f:"#e8eef7",st:"#6b86ad",da:null};
+    if(x.unk) return {t:x.unk,s:"? Ainda não sabemos. Toque se souber!",f:"#eeeeee",st:"#888",da:"3 4"};
+    var p=P[x.id]||{n:x.id,s:"p"}; var ok=p.s==="c";
+    var nome=(x.id==="irmaos")?"Alef, Alyson, Álex e Adrian (netos)":p.n;
+    return {t:nome,s:(ok?"✔ com documento":"? falta confirmar")+(p.aj?"  🏅":""),f:ok?"#e1f4e7":"#fff0d6",st:ok?"#14663a":"#a04a00",da:ok?null:"7 4"};
+  }
+  function atualizar(foco){
+    tree(root);
+    var nodes=root.descendants(), links=root.links();
+    var L=gl.selectAll("path").data(links,function(d){return d.target.data._k||(d.target.data._k=Math.random());});
+    L.exit().remove();
+    L.enter().append("path").attr("class","lnk").merge(L)
+      .attr("d",function(d){ return "M"+(d.source.y+W)+","+d.source.x+"C"+(d.source.y+W+DX*0.35)+","+d.source.x+" "+(d.target.y-DX*0.3)+","+d.target.x+" "+d.target.y+","+d.target.x; });
+    var N=gn.selectAll("g.no").data(nodes,function(d){return d.data._k||(d.data._k=Math.random());});
+    N.exit().remove();
+    var E=N.enter().append("g").attr("class","no");
+    E.append("g").attr("class","corpo");
+    E.append("g").attr("class","tg");
+    var A=E.merge(N);
+    A.attr("transform",function(d){return "translate("+d.y+","+(d.x-H/2)+")";})
+     .attr("data-id",function(d){return d.data.id||"";});
+    A.select(".corpo").each(function(d){
+      var el=d3.select(this); el.selectAll("*").remove(); var k=info(d);
+      el.append("rect").attr("width",W).attr("height",H).attr("fill",k.f).attr("stroke",k.st).attr("stroke-dasharray",k.da);
+      var ls=quebra(k.t,27);
+      ls.forEach(function(l,i){ el.append("text").attr("class","nome").attr("x",10).attr("y",ls.length>1?18+i*16:24).text(l); });
+      el.append("text").attr("class","sub").attr("x",10).attr("y",H-9).text(k.s);
+      el.append("title").text(k.t);
+      el.on("click",function(ev){ ev.stopPropagation(); if(d.data.grupo){ alternar(d); } else if(d.data.unk){ abrirDesconhecido(d.data.unk); } else { abrir(d.data.id); } });
+    });
+    A.select(".tg").each(function(d){
+      var el=d3.select(this); el.selectAll("*").remove(); var k=kids(d); if(!k||!k.length) return;
+      el.attr("transform","translate("+(W+2)+","+(H/2)+")");
+      el.append("circle").attr("r",15);
+      el.append("text").text(d.children?"−":"+");
+      el.append("title").text(d.children?"Fechar este ramo":"Abrir este ramo");
+      el.on("click",function(ev){ ev.stopPropagation(); alternar(d); });
+    });
+  }
+  function alternar(d){ if(d.children){ d._children=d.children; d.children=null; } else if(d._children){ d.children=d._children; d._children=null; } atualizar(); }
+  function centrar(d,esc){
+    var r=box.getBoundingClientRect(); var s=esc||d3.zoomTransform(svg.node()).k||1;
+    svg.transition().duration(500).call(zoom.transform,d3.zoomIdentity.translate(r.width/2-(d.y+W/2)*s, r.height/2-d.x*s).scale(s));
+  }
+  window.grafoZoom=function(f){ svg.transition().duration(300).call(zoom.scaleBy,f); };
+  window.grafoCentralizar=function(){ root.descendants().forEach(function(d){ if(d.depth>=1 && (d.data.grupo||d.depth>=2) && d.children){ d._children=d.children; d.children=null; } }); atualizar(); var r=box.getBoundingClientRect(); if(!r.width) return; var s=r.width<640?0.78:Math.min(1, Math.max(0.45, r.width/(3*DX+W+40))); svg.transition().duration(400).call(zoom.transform,d3.zoomIdentity.translate(20, r.height/2).scale(s)); };
+  window.grafoAbrirTudo=function(){ (function abre(d){ if(d._children){ d.children=d._children; d._children=null; } (d.children||[]).forEach(abre); })(root); atualizar(); var r=box.getBoundingClientRect(); svg.transition().duration(400).call(zoom.transform,d3.zoomIdentity.translate(20,r.height/2).scale(0.35)); };
+  window.grafoRecolher=function(){ window.grafoCentralizar(); };
+  window.grafoFocar=function(id){
+    var alvo=null;
+    (function busca(d){ if(alvo) return; if(d.data.id===id){ alvo=d; return; } (kids(d)||[]).forEach(busca); })(root);
+    if(!alvo) return false;
+    var a=alvo.parent; while(a){ if(a._children){ a.children=a._children; a._children=null; } a=a.parent; }
+    atualizar(); ir("arvoreTopo");
+    setTimeout(function(){
+      centrar(alvo,1);
+      gn.selectAll("g.no").classed("hl",function(d){return d===alvo;});
+      setTimeout(function(){ gn.selectAll("g.no").classed("hl",false); },4500);
+    },350);
+    return true;
+  };
+  atualizar();
+  window.grafoCentralizar();
+  GRAFO=root;
+}
+
+montar();
+desenharRoda();
+try{ desenharGrafo(); }catch(e){ console.error(e); document.getElementById("grafo").style.display="none"; document.getElementById("grafoAviso").style.display="block"; document.getElementById("listaArvore").open=true; }
+try{ iniciarMapa(); }catch(e){ document.getElementById("mapa").style.display="none"; document.getElementById("mapaAviso").style.display="block"; }
+document.querySelectorAll(".navbar button").forEach(function(b){ b.addEventListener("click",function(){ mostrarAba(b.getAttribute("data-ir")); }); });
+window.addEventListener("hashchange",function(){ var h=location.hash.slice(1); if(h) mostrarAba(h); });
+(function(){ var h=location.hash.slice(1), s=null; try{ s=localStorage.getItem("arvoreValentina_aba"); }catch(e){} mostrarAba(h||s||"inicio"); })();
+</script>
+</body>
+</html>

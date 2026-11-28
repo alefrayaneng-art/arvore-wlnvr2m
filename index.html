@@ -140,6 +140,7 @@ body{padding-bottom:6rem}
       <button onclick="mostrarAba('roda')"><span>⭕</span>Roda<small>todos os antepassados num círculo</small></button>
       <button onclick="mostrarAba('mapa')"><span>🗺️</span>Mapa<small>as cidades da família</small></button>
       <button onclick="mostrarAba('historias')"><span>📖</span>Histórias<small>o que se conta</small></button>
+      <button onclick="mostrarAba('lorrany')"><span>💞</span>Lado da Lorrany<small>a família dela, ela no centro</small></button>
       <button onclick="mostrarAba('documentos')"><span>📜</span>Provas<small>fotos dos documentos</small></button>
       <button onclick="mostrarAba('tarefas')"><span>✅</span>Ajudar<small>documentos que faltam</small></button>
       <button onclick="mostrarAba('responder')"><span>💬</span>Responder<small>mandar pelo WhatsApp</small></button>
@@ -164,7 +165,7 @@ body{padding-bottom:6rem}
 
 <section class="aba" data-aba="arvore">
 <h2 id="arvoreTopo">🌳 Árvore da família</h2>
-<p class="small"><b>＋</b> abre um ramo, <b>－</b> fecha. Toque no <b>nome</b> para ver detalhes. Arraste para andar; use dois dedos ou os botões para aproximar.</p>
+<p class="small"><b>＋</b> abre um ramo, <b>－</b> fecha. Toque no <b>nome</b> para ver detalhes. Arraste para andar; use dois dedos ou os botões para aproximar. <a href="#" onclick="mostrarAba('lorrany');return false">💞 Ver o lado da Lorrany</a></p>
 <div class="tools" id="grafoBotoes">
   <button onclick="grafoZoom(1.3)" aria-label="Aproximar">🔍＋</button>
   <button onclick="grafoZoom(1/1.3)" aria-label="Afastar">🔍－</button>
@@ -258,6 +259,67 @@ body{padding-bottom:6rem}
 <figure><img loading="lazy" src="docs/restritos/rg_silvano.jpg" alt="Documento restrito: RG e CNH do Silvano"><figcaption><b>RG</b>: RG e CNH do Silvano</figcaption></figure>
 <figure><img loading="lazy" src="docs/restritos/rg_celiane.jpg" alt="Documento restrito: RG da Celiane"><figcaption><b>RG</b>: RG da Celiane</figcaption></figure>
 </div>
+</section>
+
+<section class="aba" data-aba="lorrany">
+<h2>💞 Lado da Lorrany</h2>
+<p class="small">A família da <b>Lorrany Prado Valentina</b>, esposa do Alef. Ela fica no centro; o lado do pai à esquerda e o da mãe à direita. Toque num nome para ver o que sabemos. <span style="color:#3f8f4a">■</span> verde = tem documento · <span style="color:#d98a1c">■</span> laranja = pista sem prova · <span style="color:#9a958c">■</span> cinza = ainda não sabemos.</p>
+<svg id="rodaLor" viewBox="0 0 1120 590" role="img" aria-label="Roda da família da Lorrany" style="width:100%;height:auto;max-width:900px;display:block;margin:auto">
+<path d="M365.0,565.0 A195,195 0 0 1 560.0,370.0 L560.0,465.0 A100,100 0 0 0 460.0,565.0Z" fill="#9a958c" fill-opacity="0.3" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_pai')"><title>Pai ?</title></path>
+<text transform="translate(455.7 460.7) rotate(0.0)" text-anchor="middle" font-size="30" fill="#3a3631" pointer-events="none"><tspan x="0" dy="-0.15em" font-weight="bold">Pai</tspan><tspan x="0" dy="1.1em">?</tspan></text>
+<path d="M560.0,370.0 A195,195 0 0 1 755.0,565.0 L660.0,565.0 A100,100 0 0 0 560.0,465.0Z" fill="#9a958c" fill-opacity="0.3" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_mae')"><title>Mãe ?</title></path>
+<text transform="translate(664.3 460.7) rotate(0.0)" text-anchor="middle" font-size="30" fill="#3a3631" pointer-events="none"><tspan x="0" dy="-0.15em" font-weight="bold">Mãe</tspan><tspan x="0" dy="1.1em">?</tspan></text>
+<path d="M230.0,565.0 A330,330 0 0 1 326.7,331.7 L422.1,427.1 A195,195 0 0 0 365.0,565.0Z" fill="#9a958c" fill-opacity="0.3" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_u')"><title>Avô paterno</title></path>
+<text transform="translate(317.5 464.5) rotate(-67.5)" text-anchor="middle" font-size="26" fill="#3a3631" pointer-events="none"><tspan x="0" dy="-0.15em" font-weight="bold">Avô</tspan><tspan x="0" dy="1.1em">paterno</tspan></text>
+<path d="M326.7,331.7 A330,330 0 0 1 560.0,235.0 L560.0,370.0 A195,195 0 0 0 422.1,427.1Z" fill="#9a958c" fill-opacity="0.3" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_u')"><title>Avó paterna</title></path>
+<text transform="translate(459.5 322.5) rotate(-22.5)" text-anchor="middle" font-size="26" fill="#3a3631" pointer-events="none"><tspan x="0" dy="-0.15em" font-weight="bold">Avó</tspan><tspan x="0" dy="1.1em">paterna</tspan></text>
+<path d="M560.0,235.0 A330,330 0 0 1 793.3,331.7 L697.9,427.1 A195,195 0 0 0 560.0,370.0Z" fill="#3f8f4a" fill-opacity="0.92" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_raimundo')"><title>Raimundo dos Santos</title></path>
+<text transform="translate(660.5 322.5) rotate(22.5)" text-anchor="middle" font-size="26" fill="#fff" pointer-events="none"><tspan x="0" dy="-0.15em" font-weight="bold">Raimundo</tspan><tspan x="0" dy="1.1em">dos Santos</tspan></text>
+<path d="M793.3,331.7 A330,330 0 0 1 890.0,565.0 L755.0,565.0 A195,195 0 0 0 697.9,427.1Z" fill="#3f8f4a" fill-opacity="0.92" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_lucia')"><title>Lúcia Cordeiro Prado</title></path>
+<text transform="translate(802.5 464.5) rotate(67.5)" text-anchor="middle" font-size="26" fill="#fff" pointer-events="none"><tspan x="0" dy="-0.15em" font-weight="bold">Lúcia</tspan><tspan x="0" dy="1.1em">Cordeiro Prado</tspan></text>
+<path d="M95.0,565.0 A465,465 0 0 1 130.4,387.1 L255.1,438.7 A330,330 0 0 0 230.0,565.0Z" fill="#9a958c" fill-opacity="0.3" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_u')"><title>ainda não sabemos</title></path>
+<path d="M130.4,387.1 A465,465 0 0 1 231.2,236.2 L326.7,331.7 A330,330 0 0 0 255.1,438.7Z" fill="#9a958c" fill-opacity="0.3" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_u')"><title>ainda não sabemos</title></path>
+<path d="M231.2,236.2 A465,465 0 0 1 382.1,135.4 L433.7,260.1 A330,330 0 0 0 326.7,331.7Z" fill="#9a958c" fill-opacity="0.3" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_u')"><title>ainda não sabemos</title></path>
+<path d="M382.1,135.4 A465,465 0 0 1 560.0,100.0 L560.0,235.0 A330,330 0 0 0 433.7,260.1Z" fill="#9a958c" fill-opacity="0.3" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_u')"><title>ainda não sabemos</title></path>
+<path d="M560.0,100.0 A465,465 0 0 1 737.9,135.4 L686.3,260.1 A330,330 0 0 0 560.0,235.0Z" fill="#3f8f4a" fill-opacity="0.92" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_jmauricio')"><title>José Maurício dos Santos</title></path>
+<text transform="translate(637.5 175.1) rotate(-78.8)" text-anchor="middle" font-size="23" fill="#fff" pointer-events="none"><tspan x="0" dy="-0.15em" font-weight="bold">José Maurício</tspan><tspan x="0" dy="1.1em">dos Santos</tspan></text>
+<path d="M737.9,135.4 A465,465 0 0 1 888.8,236.2 L793.3,331.7 A330,330 0 0 0 686.3,260.1Z" fill="#3f8f4a" fill-opacity="0.92" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_jmauricio')"><title>Maria Madalena dos Santos</title></path>
+<text transform="translate(780.8 234.5) rotate(-56.2)" text-anchor="middle" font-size="23" fill="#fff" pointer-events="none"><tspan x="0" dy="-0.15em" font-weight="bold">Maria Madalena</tspan><tspan x="0" dy="1.1em">dos Santos</tspan></text>
+<path d="M888.8,236.2 A465,465 0 0 1 989.6,387.1 L864.9,438.7 A330,330 0 0 0 793.3,331.7Z" fill="#3f8f4a" fill-opacity="0.92" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_joao')"><title>João Damasceno Prado</title></path>
+<text transform="translate(890.5 344.2) rotate(-33.8)" text-anchor="middle" font-size="23" fill="#fff" pointer-events="none"><tspan x="0" dy="-0.15em" font-weight="bold">João Damasceno</tspan><tspan x="0" dy="1.1em">Prado</tspan></text>
+<path d="M989.6,387.1 A465,465 0 0 1 1025.0,565.0 L890.0,565.0 A330,330 0 0 0 864.9,438.7Z" fill="#3f8f4a" fill-opacity="0.92" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_raimunda')"><title>Raimunda Cordeiro Prado</title></path>
+<text transform="translate(949.9 487.5) rotate(-11.2)" text-anchor="middle" font-size="23" fill="#fff" pointer-events="none"><tspan x="0" dy="-0.15em" font-weight="bold">Raimunda</tspan><tspan x="0" dy="1.1em">Cordeiro Prado</tspan></text>
+<path d="M0.0,565.0 A560,560 0 0 1 10.8,455.7 L103.9,474.3 A465,465 0 0 0 95.0,565.0Z" fill="#9a958c" fill-opacity="0.3" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_u')"><title>ainda não sabemos</title></path>
+<path d="M10.8,455.7 A560,560 0 0 1 42.6,350.7 L130.4,387.1 A465,465 0 0 0 103.9,474.3Z" fill="#9a958c" fill-opacity="0.3" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_u')"><title>ainda não sabemos</title></path>
+<path d="M42.6,350.7 A560,560 0 0 1 94.4,253.9 L173.4,306.7 A465,465 0 0 0 130.4,387.1Z" fill="#9a958c" fill-opacity="0.3" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_u')"><title>ainda não sabemos</title></path>
+<path d="M94.4,253.9 A560,560 0 0 1 164.0,169.0 L231.2,236.2 A465,465 0 0 0 173.4,306.7Z" fill="#9a958c" fill-opacity="0.3" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_u')"><title>ainda não sabemos</title></path>
+<path d="M164.0,169.0 A560,560 0 0 1 248.9,99.4 L301.7,178.4 A465,465 0 0 0 231.2,236.2Z" fill="#9a958c" fill-opacity="0.3" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_u')"><title>ainda não sabemos</title></path>
+<path d="M248.9,99.4 A560,560 0 0 1 345.7,47.6 L382.1,135.4 A465,465 0 0 0 301.7,178.4Z" fill="#9a958c" fill-opacity="0.3" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_u')"><title>ainda não sabemos</title></path>
+<path d="M345.7,47.6 A560,560 0 0 1 450.7,15.8 L469.3,108.9 A465,465 0 0 0 382.1,135.4Z" fill="#9a958c" fill-opacity="0.3" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_u')"><title>ainda não sabemos</title></path>
+<path d="M450.7,15.8 A560,560 0 0 1 560.0,5.0 L560.0,100.0 A465,465 0 0 0 469.3,108.9Z" fill="#9a958c" fill-opacity="0.3" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_u')"><title>ainda não sabemos</title></path>
+<path d="M560.0,5.0 A560,560 0 0 1 669.3,15.8 L650.7,108.9 A465,465 0 0 0 560.0,100.0Z" fill="#9a958c" fill-opacity="0.3" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_u')"><title>ainda não sabemos</title></path>
+<path d="M669.3,15.8 A560,560 0 0 1 774.3,47.6 L737.9,135.4 A465,465 0 0 0 650.7,108.9Z" fill="#9a958c" fill-opacity="0.3" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_u')"><title>ainda não sabemos</title></path>
+<path d="M774.3,47.6 A560,560 0 0 1 871.1,99.4 L818.3,178.4 A465,465 0 0 0 737.9,135.4Z" fill="#9a958c" fill-opacity="0.3" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_u')"><title>ainda não sabemos</title></path>
+<path d="M871.1,99.4 A560,560 0 0 1 956.0,169.0 L888.8,236.2 A465,465 0 0 0 818.3,178.4Z" fill="#9a958c" fill-opacity="0.3" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_u')"><title>ainda não sabemos</title></path>
+<path d="M956.0,169.0 A560,560 0 0 1 1025.6,253.9 L946.6,306.7 A465,465 0 0 0 888.8,236.2Z" fill="#d98a1c" fill-opacity="0.92" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_saturnino')"><title>Saturnino (pista)</title></path>
+<text transform="translate(956.2 239.9) rotate(-39.4)" text-anchor="middle" font-size="20" fill="#fff" pointer-events="none"><tspan x="0" dy="-0.15em" font-weight="bold">Saturnino</tspan><tspan x="0" dy="1.1em">(pista)</tspan></text>
+<path d="M1025.6,253.9 A560,560 0 0 1 1077.4,350.7 L989.6,387.1 A465,465 0 0 0 946.6,306.7Z" fill="#d98a1c" fill-opacity="0.92" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_saturnino')"><title>Minera (pista)</title></path>
+<text transform="translate(1012.0 323.4) rotate(-28.1)" text-anchor="middle" font-size="20" fill="#fff" pointer-events="none"><tspan x="0" dy="-0.15em" font-weight="bold">Minera</tspan><tspan x="0" dy="1.1em">(pista)</tspan></text>
+<path d="M1077.4,350.7 A560,560 0 0 1 1109.2,455.7 L1016.1,474.3 A465,465 0 0 0 989.6,387.1Z" fill="#9a958c" fill-opacity="0.3" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_u')"><title>ainda não sabemos</title></path>
+<path d="M1109.2,455.7 A560,560 0 0 1 1120.0,565.0 L1025.0,565.0 A465,465 0 0 0 1016.1,474.3Z" fill="#9a958c" fill-opacity="0.3" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_u')"><title>ainda não sabemos</title></path>
+<path d="M460,565 A100,100 0 0 1 660,565 Z" fill="#b5486e" stroke="#fff" stroke-width="2" style="cursor:pointer" onclick="lorAbrir('l_lorrany')"/>
+<text x="560" y="535" text-anchor="middle" font-size="32" font-weight="bold" fill="#fff" pointer-events="none">Lorrany</text>
+<text x="0" y="587" font-size="22" fill="currentColor">◀ lado do pai</text><text x="1120" y="587" text-anchor="end" font-size="22" fill="currentColor">lado da mãe ▶</text></svg>
+<div id="lorInfo" class="card" style="margin:.8rem 0;padding:.8rem 1rem;border-radius:12px;border:1px solid rgba(0,0,0,.12)"></div>
+<h3>📜 Documento que temos deste lado</h3>
+<div class="docs restritos"><figure><img loading="lazy" src="docs/restritos/1974_casamento_raimundo_lucia.jpg" alt="Documento restrito: casamento de Raimundo e Lúcia"><figcaption><b>1974</b>: certidão de casamento dos avós maternos, Raimundo e Lúcia (Itapipoca/CE)</figcaption></figure></div>
+<h3>🙋 Como ajudar deste lado</h3>
+<ul>
+<li>Nome completo e data de nascimento do <b>pai</b> e da <b>mãe</b> da Lorrany.</li>
+<li>Nomes dos <b>avós paternos</b> (a certidão de nascimento ou de casamento do pai mostra).</li>
+<li>Certidão de óbito da bisavó <b>Raimunda Cordeiro Prado</b> (já tinha falecido em 1974).</li>
+<li>Saber se o bisavô <b>João Damasceno Prado</b> é o que morreu em Itapipoca em 1991.</li>
+</ul>
 </section>
 
 <section class="aba" data-aba="tarefas">
@@ -1226,6 +1288,23 @@ try{ iniciarMapa(); }catch(e){ document.getElementById("mapa").style.display="no
 document.querySelectorAll(".navbar button").forEach(function(b){ b.addEventListener("click",function(){ mostrarAba(b.getAttribute("data-ir")); }); });
 window.addEventListener("hashchange",function(){ var h=location.hash.slice(1); if(h) mostrarAba(h); });
 (function(){ var h=location.hash.slice(1), s=null; try{ s=localStorage.getItem("arvoreValentina_aba"); }catch(e){} mostrarAba(h||s||"inicio"); })();
+</script>
+
+<script>
+var LOR={
+ l_lorrany:["Lorrany Prado Valentina","Esposa do Alef. Aniversário em 19 de julho.",["Os pais dela ainda não foram anotados aqui."],""],
+ l_pai:["Pai da Lorrany","Ainda não anotado",[],"Qual o nome completo do pai da Lorrany?"],
+ l_mae:["Mãe da Lorrany","Filha de Raimundo e Lúcia (avós maternos)",["A certidão de casamento dos avós maternos foi enviada pela Lorrany em 27/11/2026."],"Qual o nome completo da mãe da Lorrany?"],
+ l_u:["Avós paternos","Ainda não sabemos",[],"Alguém sabe os nomes dos pais do pai da Lorrany?"],
+ l_raimundo:["Raimundo Nonato dos Santos","Avô materno. Nasceu em 1954, em Itapipoca/CE",["Certidão de casamento lida: filho de José Maurício dos Santos e Maria Madalena dos Santos.","Casou com Lúcia em 16/05/1974, em Itapipoca/CE."],""],
+ l_lucia:["Lúcia Cordeiro Prado (depois Lúcia Prado Santos)","Avó materna. Nasceu em 1956, em Itapipoca/CE",["Certidão de casamento lida: filha de João Damasceno Prado e Raimunda Cordeiro Prado.","Em 1974 a mãe dela, Raimunda, já tinha falecido."],""],
+ l_jmauricio:["José Maurício dos Santos e Maria Madalena dos Santos","Bisavós (pais do Raimundo)",["Aparecem como pais do Raimundo na certidão de casamento dele (1974)."],"Alguém sabe onde e quando eles nasceram?"],
+ l_joao:["João Damasceno Prado","Bisavô (pai da Lúcia)",["Aparece como pai da Lúcia na certidão de casamento dela (1974).","Pista: o índice do FamilySearch tem o óbito de um João Damasceno Prado nascido em 28/08/1920 em Itapipoca e falecido lá em 28/10/1991, filho de Saturnino Lopes do Prado e Minera Carneiro do Prado, casado com Raulinda Teixeira Prado (talvez um segundo casamento). A imagem é restrita, então ainda não dá para ter certeza de que é ele."],"Ele se casou de novo depois da morte da Raimunda? Com a Raulinda?"],
+ l_raimunda:["Raimunda Cordeiro Prado","Bisavó (mãe da Lúcia)",["Aparece como mãe da Lúcia na certidão de casamento de 1974, já falecida."],"Quando e onde ela faleceu?"],
+ l_saturnino:["Saturnino Lopes do Prado e Minera Carneiro do Prado","Trisavós (pista, sem prova)",["Aparecem como pais de um João Damasceno Prado (1920–1991) no índice de um óbito de Itapipoca. Só valem se ele for mesmo o nosso João."],"Alguém já ouviu falar do Saturnino?"]
+};
+function lorAbrir(k){var p=LOR[k];if(!p)return;var h='<b style="font-size:1.1rem">'+p[0]+'</b><br><span class="small">'+p[1]+'</span>';if(p[2].length)h+='<ul>'+p[2].map(function(s){return'<li>'+s+'</li>'}).join('')+'</ul>';if(p[3])h+='<p>❓ <b>'+p[3]+'</b></p>';document.getElementById('lorInfo').innerHTML=h;}
+lorAbrir('l_lorrany');
 </script>
 </body>
 </html>
